@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 MessageRole = Literal["user", "assistant", "system", "tool", "summary"]
 
+
 class Message(BaseModel):
     """消息类"""
 
@@ -18,8 +19,8 @@ class Message(BaseModel):
         super().__init__(
             content=content,
             role=role,
-            timestamp=kwargs.get('timestamp', datetime.now()),
-            metadata=kwargs.get('metadata', {})
+            timestamp=kwargs.get("timestamp", datetime.now()),
+            metadata=kwargs.get("metadata", {}),
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -28,7 +29,7 @@ class Message(BaseModel):
             "role": self.role,
             "content": self.content,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
     @classmethod
@@ -42,7 +43,7 @@ class Message(BaseModel):
             content=data["content"],
             role=data["role"],
             timestamp=timestamp,
-            metadata=data.get("metadata")
+            metadata=data.get("metadata"),
         )
 
     def to_text(self) -> str:

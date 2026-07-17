@@ -13,7 +13,7 @@ logging.getLogger("neo4j").setLevel(logging.WARNING)
 logging.getLogger("neo4j.notifications").setLevel(logging.WARNING)
 
 # 核心组件
-from .core.llm import MyAgent
+from .core.llm import AgentLLM, MyAgent
 from .core.config import Config
 from .core.message import Message
 from .core.exceptions import MyAgentException
@@ -31,6 +31,7 @@ from .tools.builtin.calculator import CalculatorTool, calculate
 __all__ = [
 
     # 核心组件
+    "AgentLLM",
     "MyAgent",
     "Config",
     "Message",
