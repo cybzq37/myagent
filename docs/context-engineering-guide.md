@@ -1,6 +1,6 @@
 ﻿# 上下文工程指南（Context Engineering�?
 
-## 📖 概述
+##  概述
 
 **上下文工�?*�?MyAgent 框架的核心能力，解决长对话中的上下文爆窗、Token 成本爆炸和缓存失效问题�?
 
@@ -20,7 +20,7 @@
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 1. 自动历史压缩（简单摘要）
 
@@ -111,7 +111,7 @@ agent.run("读取大文�?)
 
 ---
 
-## 💡 核心组件
+##  核心组件
 
 ### 1. HistoryManager - 历史管理�?
 
@@ -269,7 +269,7 @@ text = msg.to_text()
 
 ---
 
-## 📝 配置选项
+##  配置选项
 
 ### Config 类扩�?
 
@@ -293,7 +293,7 @@ config = Config(
 
 ---
 
-## 📊 实际案例
+##  实际案例
 
 ### 案例 1：长对话压缩
 
@@ -350,7 +350,7 @@ manager.append(Message(role="user", content="新问�?))
 
 ---
 
-## 🎯 最佳实�?
+##  最佳实�?
 
 ### 1. 合理设置压缩阈�?
 
@@ -387,7 +387,7 @@ config = Config(tool_output_truncate_direction="head_tail")
 
 ---
 
-## 🔧 高级用法
+##  高级用法
 
 ### 1. 智能摘要（可选）
 
@@ -444,7 +444,7 @@ manager.from_dict(history_data)
 
 ---
 
-## 🔗 相关文档
+##  相关文档
 
 - [会话持久化](./session-persistence-guide.md) - 保存和恢复会�?
 - [可观测性](./observability-guide.md) - 追踪上下文使用情�?
@@ -491,7 +491,7 @@ A: 根据 OpenAI 的缓存机制：
 
 ---
 
-## 📈 性能指标
+##  性能指标
 
 ### Token 节省效果
 

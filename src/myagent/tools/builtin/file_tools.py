@@ -216,8 +216,7 @@ class ReadTool(Tool):
             else:
                 lines = [f"目录 '{path}' 包含 {total_files} 个文件，{total_dirs} 个目录：\n"]
                 for entry in entries:
-                    type_icon = "📁" if entry["type"] == "directory" else "📄"
-                    lines.append(f"{type_icon} {entry['name']:<40} {entry['size']:>10} {entry['mtime']}")
+                    lines.append(f"{entry['name']:<40} {entry['size']:>10} {entry['mtime']}")
                 text = "\n".join(lines)
 
             return ToolResponse.success(

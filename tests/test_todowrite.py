@@ -225,7 +225,6 @@ class TestTodoWriteTool:
             ]
         })
 
-        assert "✅" in response.text
         assert "[2/2]" in response.text
         assert "所有任务已完成" in response.text
 

@@ -24,14 +24,14 @@ class TestEnvironment:
         api_key = os.getenv("LLM_API_KEY")
         assert api_key is not None, "请配置 LLM_API_KEY 环境变量"
         assert len(api_key) > 0, "LLM_API_KEY 不能为空"
-        print(f"\n✅ 环境变量配置正常")
+        print(f"\n 环境变量配置正常")
     
     def test_llm_initialization(self):
         """验证LLM可以正常初始化"""
         try:
             llm = MyAgent()
             assert llm is not None
-            print(f"\n✅ LLM初始化成功")
+            print(f"\n LLM初始化成功")
         except Exception as e:
             pytest.fail(f"LLM初始化失败: {e}")
 
@@ -53,7 +53,7 @@ class TestSimpleAgentUsage:
         print(f"\n对话结果: {result}")
         assert result is not None
         assert len(result) > 10
-        print("✅ SimpleAgent基础对话测试通过")
+        print(" SimpleAgent基础对话测试通过")
     
     def test_with_calculator(self):
         """场景2: 使用计算器工具"""
@@ -73,7 +73,7 @@ class TestSimpleAgentUsage:
         print(f"\n计算结果: {result}")
         # 256 * 789 = 201,984
         assert "201" in result or "201,9" in result
-        print("✅ SimpleAgent工具调用测试通过")
+        print(" SimpleAgent工具调用测试通过")
     
     def test_multi_turn(self):
         """场景3: 多轮对话"""
@@ -87,7 +87,7 @@ class TestSimpleAgentUsage:
         
         print(f"\n记忆测试结果: {result}")
         assert "蓝" in result
-        print("✅ SimpleAgent多轮对话测试通过")
+        print(" SimpleAgent多轮对话测试通过")
 
 
 class TestReActAgentUsage:
@@ -110,7 +110,7 @@ class TestReActAgentUsage:
         print(f"\n推理结果: {result}")
         assert result is not None
         assert len(result) > 10
-        print("✅ ReActAgent基础推理测试通过")
+        print(" ReActAgent基础推理测试通过")
     
     def test_tool_reasoning(self):
         """场景2: 工具推理"""
@@ -129,7 +129,7 @@ class TestReActAgentUsage:
         
         print(f"\n工具推理结果: {result}")
         assert "40" in result
-        print("✅ ReActAgent工具推理测试通过")
+        print(" ReActAgent工具推理测试通过")
 
 
 class TestReflectionAgentUsage:
@@ -149,7 +149,7 @@ class TestReflectionAgentUsage:
         print(f"\n反思结果: {result}")
         assert result is not None
         assert len(result) > 10
-        print("✅ ReflectionAgent基础反思测试通过")
+        print(" ReflectionAgent基础反思测试通过")
 
     def test_code_generation(self):
         """场景2: 代码生成与反思"""
@@ -164,7 +164,7 @@ class TestReflectionAgentUsage:
 
         print(f"\n代码生成结果: {result}")
         assert "def" in result or "factorial" in result.lower()
-        print("✅ ReflectionAgent代码生成测试通过")
+        print(" ReflectionAgent代码生成测试通过")
 
 
 class TestPlanAndSolveAgentUsage:
@@ -183,7 +183,7 @@ class TestPlanAndSolveAgentUsage:
         print(f"\n规划结果: {result}")
         assert result is not None
         assert len(result) > 10
-        print("✅ PlanAndSolveAgent基础规划测试通过")
+        print(" PlanAndSolveAgent基础规划测试通过")
 
     def test_math_planning(self):
         """场景2: 数学问题规划"""
@@ -202,7 +202,7 @@ class TestPlanAndSolveAgentUsage:
 
         print(f"\n数学规划结果: {result}")
         assert "20" in result
-        print("✅ PlanAndSolveAgent数学规划测试通过")
+        print(" PlanAndSolveAgent数学规划测试通过")
 
 
 class TestAgentComparison:
@@ -229,7 +229,7 @@ class TestAgentComparison:
         print(f"\n[PlanAndSolveAgent] {result3[:100]}...")
 
         assert all([result1, result2, result3])
-        print("✅ 不同Agent对比测试通过")
+        print(" 不同Agent对比测试通过")
 
 
 class TestErrorHandling:
@@ -244,9 +244,9 @@ class TestErrorHandling:
             result = agent.run("")
             # 应该能处理空输入
             assert result is not None
-            print("✅ 空输入处理测试通过")
+            print(" 空输入处理测试通过")
         except Exception as e:
-            print(f"⚠️ 空输入处理异常: {e}")
+            print(f" 空输入处理异常: {e}")
 
     def test_agent_without_tools(self):
         """场景: Agent无工具时的表现"""
@@ -255,7 +255,7 @@ class TestErrorHandling:
 
         result = agent.run("你好")
         assert result is not None
-        print("✅ 无工具Agent测试通过")
+        print(" 无工具Agent测试通过")
 
 
 if __name__ == "__main__":

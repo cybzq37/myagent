@@ -8,6 +8,7 @@
 import json
 import uuid
 import re
+import sys
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 from pathlib import Path
@@ -177,9 +178,24 @@ class TraceLogger:
         self.jsonl_file.close()
         self.html_file.close()
 
-        print(f"✅ Trace 已保存:")
-        print(f"   JSONL: {self.jsonl_path}")
-        print(f"   HTML:  {self.html_path}")
+        self._safe_console_write("Trace 已保存:")
+        self._safe_console_write(f"   JSONL: {self.jsonl_path}")
+        self._safe_console_write(f"   HTML:  {self.html_path}")
+
+    def _safe_console_write(self, text: str) -> None:
+        """安全写入控制台，避免非 UTF-8 终端因 emoji 抛编码异常。"""
+        stream = sys.stdout
+        encoding = getattr(stream, "encoding", None) or "utf-8"
+        data = f"{text}\n".encode(encoding, errors="replace")
+
+        buffer = getattr(stream, "buffer", None)
+        if buffer is not None:
+            buffer.write(data)
+            buffer.flush()
+            return
+
+        stream.write(data.decode(encoding, errors="replace"))
+        stream.flush()
 
     def _compute_stats(self) -> Dict[str, Any]:
         """计算统计数据
@@ -383,12 +399,12 @@ class TraceLogger:
 </head>
 <body>
     <div class="header">
-        <h1>🔍 Trace Session: {self.session_id}</h1>
+        <h1>Trace Session: {self.session_id}</h1>
         <p>生成时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
     </div>
 
     <div class="events-container">
-        <h2>📋 事件列表</h2>
+        <h2>事件列表</h2>
 """
         self.html_file.write(header)
         self.html_file.flush()
@@ -451,7 +467,7 @@ class TraceLogger:
                 message = error.get("message", "")
                 error_items += f"<li>Step {step}: <strong>{error_type}</strong> - {message}</li>\n"
             error_list_html = f"""
-        <h3>❌ 错误列表 ({len(stats["errors"])})</h3>
+        <h3>错误列表 ({len(stats["errors"])})</h3>
         <ul class="error-list">
             {error_items}
         </ul>
@@ -461,7 +477,7 @@ class TraceLogger:
     </div>
 
     <div class="stats-panel">
-        <h2>📊 会话统计</h2>
+        <h2>会话统计</h2>
         <div class="stats-grid">
             <div class="stat-item">
                 <span class="stat-label">总步骤数</span>
@@ -485,7 +501,7 @@ class TraceLogger:
             </div>
         </div>
 
-        <h3>🔧 工具调用统计</h3>
+        <h3>工具调用统计</h3>
         <table class="tool-stats">
             <tr><th>工具名称</th><th>调用次数</th></tr>
             {tool_stats_rows if tool_stats_rows else '<tr><td colspan="2">无工具调用</td></tr>'}

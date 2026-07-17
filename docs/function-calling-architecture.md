@@ -1,6 +1,6 @@
 ﻿# Function Calling 架构指南
 
-## 📖 概述
+##  概述
 
 **Function Calling 架构**�?MyAgent 框架的核心重构，�?LLM 基类和所�?Agent 类型统一�?Function Calling 模式，解析成功率�?85% 提升�?99%+�?
 
@@ -13,7 +13,7 @@
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 1. 使用 Function Calling
 
@@ -57,7 +57,7 @@ if response.tool_calls:
 
 ---
 
-## 💡 核心概念
+##  核心概念
 
 ### 1. 为什么重构为 Function Calling�?
 
@@ -170,7 +170,7 @@ class BaseAgent:
 
 ---
 
-## 📝 使用指南
+##  使用指南
 
 ### 1. ReActAgent 使用 Function Calling
 
@@ -241,7 +241,7 @@ result = agent.run("读取 README.md")
 
 ---
 
-## 📊 实际案例
+##  实际案例
 
 ### 案例 1：解析成功率对比
 
@@ -309,7 +309,7 @@ if tool_call.name not in registry:
 
 ---
 
-## 🎯 最佳实�?
+##  最佳实�?
 
 ### 1. 工具描述清晰
 
@@ -360,7 +360,7 @@ except Exception as e:
 
 ---
 
-## 🔧 高级用法
+##  高级用法
 
 ### 1. 自定�?Function Calling 格式
 
@@ -417,7 +417,7 @@ class ToolCallTracker(LifecycleHook):
 
 ---
 
-## 🔗 相关文档
+##  相关文档
 
 - [工具响应协议](./tool-response-protocol.md) - ToolResponse 标准
 - [异步 Agent](./async-agent-guide.md) - 异步工具调用
@@ -464,7 +464,7 @@ agent = ReActAgent("assistant", llm, trace_logger=logger)
 
 ---
 
-## 📈 性能指标
+##  性能指标
 
 ### 解析成功�?
 

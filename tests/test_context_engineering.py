@@ -317,7 +317,7 @@ class TestAgentIntegration:
         # 测试向后兼容的 _history 属性
         assert len(agent._history) == 1
 
-        print("✅ Agent HistoryManager 集成测试通过")
+        print(" Agent HistoryManager 集成测试通过")
 
     def test_agent_auto_compression(self):
         """测试 Agent 自动压缩"""
@@ -339,7 +339,7 @@ class TestAgentIntegration:
         has_summary = any(msg.role == "summary" for msg in history)
         assert has_summary or len(history) < 20  # 要么有摘要，要么已压缩
 
-        print(f"✅ 自动压缩测试通过，历史长度: {len(history)}, 包含摘要: {has_summary}")
+        print(f" 自动压缩测试通过，历史长度: {len(history)}, 包含摘要: {has_summary}")
 
     def test_agent_truncator_integration(self):
         """测试 Agent 集成 ObservationTruncator"""
@@ -352,7 +352,7 @@ class TestAgentIntegration:
         assert hasattr(agent, 'truncator')
         assert isinstance(agent.truncator, ObservationTruncator)
 
-        print("✅ Agent ObservationTruncator 集成测试通过")
+        print(" Agent ObservationTruncator 集成测试通过")
 
     def test_agent_real_conversation_with_compression(self):
         """测试真实对话场景下的自动压缩（真实 API 调用）"""
@@ -393,7 +393,7 @@ class TestAgentIntegration:
                 print(f"当前历史: {len(history)} 条消息, {rounds} 轮对话, 包含摘要: {has_summary}")
 
             except Exception as e:
-                print(f"⚠️ 第 {i+1} 轮对话失败: {e}")
+                print(f" 第 {i+1} 轮对话失败: {e}")
                 # 不中断测试，继续下一轮
 
         # 验证最终状态
@@ -408,7 +408,7 @@ class TestAgentIntegration:
 
         # 验证压缩生效
         if has_summary:
-            print("✅ 自动压缩已触发")
+            print(" 自动压缩已触发")
             # 找到 summary 消息
             summary_msg = next(msg for msg in final_history if msg.role == "summary")
             print(f"摘要内容: {summary_msg.content[:200]}...")
@@ -416,7 +416,7 @@ class TestAgentIntegration:
         # 验证保留了最近的轮次
         assert final_rounds <= config.min_retain_rounds + 1  # 允许 +1 的误差
 
-        print("✅ 真实对话压缩测试通过")
+        print(" 真实对话压缩测试通过")
 
 
 if __name__ == "__main__":

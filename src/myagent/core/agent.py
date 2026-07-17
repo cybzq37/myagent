@@ -467,7 +467,7 @@ class Agent(ABC):
 
         except Exception as e:
             # 回退到简单摘要
-            print(f"⚠️ 智能摘要生成失败: {e}，使用简单摘要")
+            print(f"智能摘要生成失败: {e}，使用简单摘要")
             return self._generate_simple_summary(history)
 
     def _format_history_for_summary(self, history: List[Message]) -> str:
@@ -675,7 +675,7 @@ class Agent(ABC):
             工具执行结果（字符串格式）
         """
         if not self.tool_registry:
-            return "❌ 错误：未配置工具注册表"
+            return "错误：未配置工具注册表"
 
         # 1. 尝试执行 Tool 对象
         tool = self.tool_registry.get_tool(tool_name)
@@ -688,13 +688,13 @@ class Agent(ABC):
                 from ..tools.response import ToolStatus
                 if response.status == ToolStatus.ERROR:
                     error_code = response.error_info.get("code", "UNKNOWN") if response.error_info else "UNKNOWN"
-                    return f"❌ 错误 [{error_code}]: {response.text}"
+                    return f"错误 [{error_code}]: {response.text}"
                 elif response.status == ToolStatus.PARTIAL:
-                    return f"⚠️ 部分成功: {response.text}"
+                    return f"部分成功: {response.text}"
                 else:
                     return response.text
             except Exception as exc:
-                return f"❌ 工具调用失败：{exc}"
+                return f"工具调用失败：{exc}"
 
         # 2. 尝试执行函数工具
         func = self.tool_registry.get_function(tool_name)
@@ -707,15 +707,15 @@ class Agent(ABC):
                 from ..tools.response import ToolStatus
                 if response.status == ToolStatus.ERROR:
                     error_code = response.error_info.get("code", "UNKNOWN") if response.error_info else "UNKNOWN"
-                    return f"❌ 错误 [{error_code}]: {response.text}"
+                    return f"错误 [{error_code}]: {response.text}"
                 elif response.status == ToolStatus.PARTIAL:
-                    return f"⚠️ 部分成功: {response.text}"
+                    return f"部分成功: {response.text}"
                 else:
                     return response.text
             except Exception as exc:
-                return f"❌ 工具调用失败：{exc}"
+                return f"工具调用失败：{exc}"
 
-        return f"❌ 错误：未找到工具 '{tool_name}'"
+        return f"错误：未找到工具 '{tool_name}'"
 
     # ==================== 会话持久化能力 ====================
 
@@ -736,7 +736,7 @@ class Agent(ABC):
         except Exception as e:
             # 自动保存失败不影响主流程
             if self.config.debug:
-                print(f"⚠️ 自动保存失败: {e}")
+                print(f"自动保存失败: {e}")
 
     def save_session(self, session_name: str) -> str:
         """手动保存会话
@@ -794,9 +794,9 @@ class Agent(ABC):
             )
 
             if not config_check["consistent"]:
-                print("⚠️ 环境配置不一致：")
+                print("环境配置不一致：")
                 for warning in config_check["warnings"]:
-                    print(f"  - {warning}")
+                    print(f" - {warning}")
 
             # 检查工具 Schema 一致性
             tool_check = self.session_store.check_tool_schema_consistency(
@@ -805,8 +805,8 @@ class Agent(ABC):
             )
 
             if tool_check["changed"]:
-                print(f"⚠️ 工具定义已变化")
-                print(f"  建议：{tool_check['recommendation']}")
+                print(f"工具定义已变化")
+                print(f" 建议：{tool_check['recommendation']}")
 
         # 恢复历史
         from .message import Message
@@ -821,7 +821,7 @@ class Agent(ABC):
         if self.tool_registry and session_data.get("read_cache"):
             self.tool_registry.read_metadata_cache = session_data["read_cache"]
 
-        print(f"✅ 会话已恢复：{session_data.get('session_id', 'unknown')}")
+        print(f"会话已恢复：{session_data.get('session_id', 'unknown')}")
 
     def list_sessions(self) -> List[Dict[str, Any]]:
         """列出所有可用会话

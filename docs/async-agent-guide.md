@@ -1,6 +1,6 @@
 ﻿# 异步 Agent 指南（Async Agent�?
 
-## 📖 概述
+##  概述
 
 **异步 Agent** �?MyAgent 框架的异步执行能力，支持 `arun()` �?`arun_stream()` 方法，实现并行工具调用和流式输出�?
 
@@ -13,7 +13,7 @@
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 1. 异步执行
 
@@ -45,7 +45,7 @@ async def main():
         if event.type == "LLM_CHUNK":
             print(event.data["content"], end="", flush=True)
         elif event.type == "TOOL_CALL_START":
-            print(f"\n🔧 调用工具: {event.data['tool_name']}")
+            print(f"\n 调用工具: {event.data['tool_name']}")
         elif event.type == "TOOL_CALL_FINISH":
             print(f"�?工具完成: {event.data['tool_name']}")
 
@@ -54,7 +54,7 @@ asyncio.run(main())
 
 ---
 
-## 💡 核心概念
+##  核心概念
 
 ### 1. 异步方法
 
@@ -110,7 +110,7 @@ asyncio.run(main())
 
 ---
 
-## 📝 使用指南
+##  使用指南
 
 ### 1. 基本异步执行
 
@@ -147,16 +147,16 @@ async def main():
     # 流式执行
     async for event in agent.arun_stream("分析项目"):
         if event.type == StreamEventType.AGENT_START:
-            print("🚀 Agent 开�?)
+            print(" Agent 开�?)
         
         elif event.type == StreamEventType.STEP_START:
-            print(f"\n📍 步骤 {event.data['step']}")
+            print(f"\n 步骤 {event.data['step']}")
         
         elif event.type == StreamEventType.THINKING:
-            print(f"💭 思�? {event.data['content']}")
+            print(f" 思�? {event.data['content']}")
         
         elif event.type == StreamEventType.TOOL_CALL_START:
-            print(f"🔧 调用: {event.data['tool_name']}")
+            print(f" 调用: {event.data['tool_name']}")
         
         elif event.type == StreamEventType.TOOL_CALL_FINISH:
             print(f"�?完成: {event.data['tool_name']}")
@@ -165,7 +165,7 @@ async def main():
             print(event.data["content"], end="", flush=True)
         
         elif event.type == StreamEventType.AGENT_FINISH:
-            print("\n🎉 Agent 完成")
+            print("\n Agent 完成")
 
 asyncio.run(main())
 ```
@@ -203,7 +203,7 @@ class MetricsHook(LifecycleHook):
         self.tool_calls += 1
     
     async def on_finish(self, event: AgentEvent):
-        print(f"📊 统计: {self.steps} �? {self.tool_calls} 次工具调�?)
+        print(f" 统计: {self.steps} �? {self.tool_calls} 次工具调�?)
 
 async def main():
     agent = ReActAgent("assistant", MyAgent())
@@ -220,7 +220,7 @@ asyncio.run(main())
 
 ---
 
-## 📊 实际案例
+##  实际案例
 
 ### 案例 1：并行工具调�?
 
@@ -269,37 +269,37 @@ from myagent.core.streaming import StreamEventType
 async def main():
     agent = ReActAgent("assistant", MyAgent())
     
-    print("🚀 开始分析项�?..")
+    print(" 开始分析项�?..")
     
     async for event in agent.arun_stream("分析项目结构"):
         if event.type == StreamEventType.STEP_START:
-            print(f"\n📍 步骤 {event.data['step']}/{event.data['max_steps']}")
+            print(f"\n 步骤 {event.data['step']}/{event.data['max_steps']}")
         
         elif event.type == StreamEventType.TOOL_CALL_START:
-            print(f"  🔧 {event.data['tool_name']}...", end="", flush=True)
+            print(f"   {event.data['tool_name']}...", end="", flush=True)
         
         elif event.type == StreamEventType.TOOL_CALL_FINISH:
             duration = event.data.get('duration_ms', 0)
             print(f" �?({duration}ms)")
         
         elif event.type == StreamEventType.AGENT_FINISH:
-            print("\n🎉 分析完成�?)
+            print("\n 分析完成�?)
 
 asyncio.run(main())
 ```
 
 **输出示例�?*
 ```
-🚀 开始分析项�?..
+ 开始分析项�?..
 
-📍 步骤 1/10
-  🔧 Read... �?(245ms)
-  🔧 Search... �?(1230ms)
+ 步骤 1/10
+   Read... �?(245ms)
+   Search... �?(1230ms)
 
-📍 步骤 2/10
-  🔧 Calculator... �?(10ms)
+ 步骤 2/10
+   Calculator... �?(10ms)
 
-🎉 分析完成�?
+ 分析完成�?
 ```
 
 ### 案例 3：错误处�?
@@ -334,7 +334,7 @@ asyncio.run(main())
 
 ---
 
-## 🎯 最佳实�?
+##  最佳实�?
 
 ### 1. 使用异步上下文管理器
 
@@ -402,7 +402,7 @@ asyncio.run(main())
 
 ---
 
-## 🔗 相关文档
+##  相关文档
 
 - [流式输出](./streaming-sse-guide.md) - SSE 协议和前端集�?
 - [可观测性](./observability-guide.md) - 追踪异步执行

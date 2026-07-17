@@ -73,17 +73,17 @@ class Planner:
                 arguments = json.loads(tool_call.arguments)
                 plan = arguments.get("steps", [])
 
-                print(f"✅ 计划已生成:")
+                print(f"计划已生成:")
                 for i, step in enumerate(plan, 1):
-                    print(f"  {i}. {step}")
+                    print(f" {i}. {step}")
 
                 return plan
             else:
-                print("❌ 模型未返回计划工具调用")
+                print("模型未返回计划工具调用")
                 return []
 
         except Exception as e:
-            print(f"❌ 生成计划时发生错误: {e}")
+            print(f"生成计划时发生错误: {e}")
             return []
 
 class Executor:
@@ -143,7 +143,7 @@ class Executor:
 
             history.append({"step": step, "result": response_text})
             final_answer = response_text
-            print(f"✅ 步骤 {i} 已完成，结果: {final_answer}")
+            print(f"步骤 {i} 已完成，结果: {final_answer}")
 
         return final_answer
 
@@ -200,7 +200,7 @@ class Executor:
                     **kwargs
                 )
             except Exception as e:
-                print(f"❌ LLM 调用失败: {e}")
+                print(f"LLM 调用失败: {e}")
                 break
 
             # 处理工具调用
@@ -234,7 +234,7 @@ class Executor:
                 try:
                     arguments = json.loads(tool_call.arguments)
                 except json.JSONDecodeError as e:
-                    print(f"❌ 工具参数解析失败: {e}")
+                    print(f"工具参数解析失败: {e}")
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_call_id,
@@ -328,7 +328,7 @@ class PlanSolveAgent(Agent):
         Returns:
             最终答案
         """
-        print(f"\n🤖 {self.name} 开始处理问题: {input_text}")
+        print(f"\n {self.name} 开始处理问题: {input_text}")
         
         # 1. 生成计划
         plan = self.planner.plan(input_text, **kwargs)
@@ -393,7 +393,7 @@ class PlanSolveAgent(Agent):
                 description="生成执行计划"
             )
 
-            print(f"\n🤖 {self.name} 开始处理问题: {input_text}")
+            print(f"\n {self.name} 开始处理问题: {input_text}")
 
             # 生成计划（同步方法，暂时保持）
             plan = self.planner.plan(input_text, **kwargs)
@@ -443,7 +443,7 @@ class PlanSolveAgent(Agent):
                 )
 
                 print(f"\n--- 步骤 {step_num}/{len(plan)} ---")
-                print(f"📋 {step_description}")
+                print(f"{step_description}")
 
                 # 构建执行提示
                 context = "\n".join([

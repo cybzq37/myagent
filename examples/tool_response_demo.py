@@ -98,7 +98,7 @@ def demo_success_response():
     
     assert response.status == ToolStatus.SUCCESS
     assert response.data["result"] == 14
-    print("\n✅ 成功响应测试通过")
+    print("\n 成功响应测试通过")
 
 
 def demo_partial_response():
@@ -117,7 +117,7 @@ def demo_partial_response():
     
     assert response.status == ToolStatus.PARTIAL
     assert response.data["truncated"] is True
-    print("\n✅ 部分成功响应测试通过")
+    print("\n 部分成功响应测试通过")
 
 
 def demo_error_responses():
@@ -153,7 +153,7 @@ def demo_error_responses():
     print(f"   错误消息: {response.error_info['message']}")
     assert response.error_info["code"] == ToolErrorCode.EXECUTION_ERROR
     
-    print("\n✅ 所有错误响应测试通过")
+    print("\n 所有错误响应测试通过")
 
 
 if __name__ == "__main__":
@@ -162,6 +162,6 @@ if __name__ == "__main__":
     demo_error_responses()
     
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

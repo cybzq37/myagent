@@ -90,7 +90,7 @@ def demo_auto_circuit_breaking():
     assert response.status == ToolStatus.ERROR
     assert response.error_info["code"] == ToolErrorCode.CIRCUIT_OPEN
     
-    print("\n✅ 自动熔断测试完成")
+    print("\n 自动熔断测试完成")
 
 
 def demo_auto_recovery():
@@ -130,7 +130,7 @@ def demo_auto_recovery():
     print(f"恢复后调用: {response.status.value}")
     assert response.status == ToolStatus.SUCCESS
     
-    print("\n✅ 自动恢复测试完成")
+    print("\n 自动恢复测试完成")
 
 
 def demo_success_reset():
@@ -167,7 +167,7 @@ def demo_success_reset():
     assert response.status == ToolStatus.ERROR
     assert response.error_info["code"] != ToolErrorCode.CIRCUIT_OPEN
     
-    print("\n✅ 成功重置测试完成")
+    print("\n 成功重置测试完成")
 
 
 def demo_manual_control():
@@ -197,7 +197,7 @@ def demo_manual_control():
     print(f"  状态: {response.status.value}")
     assert response.status == ToolStatus.SUCCESS
     
-    print("\n✅ 手动控制测试完成")
+    print("\n 手动控制测试完成")
 
 
 if __name__ == "__main__":
@@ -207,6 +207,6 @@ if __name__ == "__main__":
     demo_manual_control()
     
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

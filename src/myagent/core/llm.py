@@ -92,7 +92,7 @@ class MyAgent:
         Note:
             流式调用结束后，可通过 llm.last_call_stats 获取统计信息
         """
-        print(f"🧠 正在调用 {self.model} 模型...")
+        print(f"正在调用 {self.model} 模型...")
 
         # 准备参数
         kwargs = {
@@ -102,7 +102,7 @@ class MyAgent:
             kwargs["max_tokens"] = self.max_tokens
 
         try:
-            print("✅ 大语言模型响应成功:")
+            print("大语言模型响应成功:")
             for chunk in self._adapter.stream_invoke(messages, **kwargs):
                 print(chunk, end="", flush=True)
                 yield chunk
@@ -113,7 +113,7 @@ class MyAgent:
                 self.last_call_stats = self._adapter.last_stats
 
         except Exception as e:
-            print(f"❌ 调用LLM API时发生错误: {e}")
+            print(f"调用LLM API时发生错误: {e}")
             raise
 
     def invoke(self, messages: List[Dict[str, str]], **kwargs) -> LLMResponse:

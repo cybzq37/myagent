@@ -137,13 +137,13 @@ class DevLogStore:
     def generate_summary(self, limit: int = 10) -> str:
         """生成摘要"""
         if not self.entries:
-            return "📝 暂无开发日志"
+            return "暂无开发日志"
 
         stats = self.get_stats()
         total = stats["total_entries"]
         recent = self.entries[-limit:]
 
-        summary_parts = [f"📝 共 {total} 条日志"]
+        summary_parts = [f"共 {total} 条日志"]
 
         # 按类别统计
         cat_summary = ", ".join([
@@ -357,7 +357,7 @@ class DevLogTool(Tool):
 
         # 返回成功响应
         return ToolResponse.success(
-            text=f"✅ 日志已记录 [{category}]: {content[:50]}{'...' if len(content) > 50 else ''}",
+            text=f"日志已记录 [{category}]: {content[:50]}{'...' if len(content) > 50 else ''}",
             data={
                 "log_id": entry.id,
                 "timestamp": entry.timestamp,
@@ -379,13 +379,13 @@ class DevLogTool(Tool):
 
         if not entries:
             return ToolResponse.success(
-                text="📝 未找到匹配的日志",
+                text="未找到匹配的日志",
                 data={"entries": []},
                 stats={"matched": 0}
             )
 
         # 格式化输出
-        lines = [f"📝 找到 {len(entries)} 条日志：\n"]
+        lines = [f"找到 {len(entries)} 条日志：\n"]
         for entry in entries:
             lines.append(f"[{entry.category}] {entry.timestamp}")
             lines.append(f"  {entry.content}")
@@ -418,7 +418,7 @@ class DevLogTool(Tool):
         self._persist()
 
         return ToolResponse.success(
-            text=f"✅ 已清空 {old_count} 条日志",
+            text=f"已清空 {old_count} 条日志",
             data={"cleared_count": old_count}
         )
 

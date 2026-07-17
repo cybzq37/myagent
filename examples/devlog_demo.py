@@ -32,12 +32,12 @@ def demo_1_basic_operations():
         persistence_dir="memory/devlogs"
     )
 
-    print(f"\n✅ DevLogTool 已创建")
+    print(f"\n DevLogTool 已创建")
     print(f"   会话 ID: {tool.session_id}")
     print(f"   Agent: {tool.agent_name}")
 
     # 追加决策日志
-    print("\n📝 追加决策日志...")
+    print("\n 追加决策日志...")
     response = tool.run({
         "action": "append",
         "category": "decision",
@@ -51,7 +51,7 @@ def demo_1_basic_operations():
     print(f"   {response.text}")
 
     # 追加问题日志
-    print("\n📝 追加问题日志...")
+    print("\n 追加问题日志...")
     response = tool.run({
         "action": "append",
         "category": "issue",
@@ -64,7 +64,7 @@ def demo_1_basic_operations():
     print(f"   {response.text}")
 
     # 追加解决方案日志
-    print("\n📝 追加解决方案日志...")
+    print("\n 追加解决方案日志...")
     response = tool.run({
         "action": "append",
         "category": "solution",
@@ -77,12 +77,12 @@ def demo_1_basic_operations():
     print(f"   {response.text}")
 
     # 生成摘要
-    print("\n📊 生成摘要...")
+    print("\n 生成摘要...")
     response = tool.run({"action": "summary"})
     print(f"   {response.text}")
 
     # 读取所有日志
-    print("\n📖 读取所有日志...")
+    print("\n 读取所有日志...")
     response = tool.run({"action": "read"})
     print(response.text)
 
@@ -112,10 +112,10 @@ def demo_2_filtering():
     for log in logs:
         tool.run({"action": "append", **log})
 
-    print(f"\n✅ 已添加 {len(logs)} 条日志")
+    print(f"\n 已添加 {len(logs)} 条日志")
 
     # 按类别过滤
-    print("\n🔍 只查看决策类日志...")
+    print("\n 只查看决策类日志...")
     response = tool.run({
         "action": "read",
         "filter": {"category": "decision"}
@@ -123,7 +123,7 @@ def demo_2_filtering():
     print(response.text)
 
     # 按标签过滤
-    print("\n🔍 只查看数据库相关日志...")
+    print("\n 只查看数据库相关日志...")
     response = tool.run({
         "action": "read",
         "filter": {"tags": ["database"]}
@@ -131,7 +131,7 @@ def demo_2_filtering():
     print(response.text)
 
     # 限制数量
-    print("\n🔍 只查看最近 2 条日志...")
+    print("\n 只查看最近 2 条日志...")
     response = tool.run({
         "action": "read",
         "filter": {"limit": 2}
@@ -170,12 +170,12 @@ def demo_3_agent_integration():
     # 验证工具已注册
     tool = registry.get_tool("DevLog")
     if tool:
-        print("✅ DevLogTool 已自动注册")
-        print(f"📝 工具名称: {tool.name}")
-        print(f"📝 工具描述: {tool.description[:100]}...")
-        print(f"\n💡 Agent 现在可以使用 DevLog 工具记录开发决策和问题")
+        print(" DevLogTool 已自动注册")
+        print(f" 工具名称: {tool.name}")
+        print(f" 工具描述: {tool.description[:100]}...")
+        print(f"\n Agent 现在可以使用 DevLog 工具记录开发决策和问题")
     else:
-        print("❌ DevLogTool 未注册")
+        print(" DevLogTool 未注册")
 
 
 def demo_4_persistence():
@@ -187,7 +187,7 @@ def demo_4_persistence():
     session_id = "demo-session-004"
 
     # 第一次：创建工具并添加日志
-    print("\n📝 第一次会话：添加日志...")
+    print("\n 第一次会话：添加日志...")
     tool1 = DevLogTool(
         session_id=session_id,
         agent_name="DemoAgent",
@@ -206,15 +206,15 @@ def demo_4_persistence():
         "content": "服务间通信延迟高"
     })
 
-    print("   ✅ 已添加 2 条日志")
+    print("    已添加 2 条日志")
 
     # 验证文件已创建
     devlog_file = Path(".") / "memory/devlogs" / f"devlog-{session_id}.json"
-    print(f"   📁 日志文件: {devlog_file}")
-    print(f"   ✅ 文件存在: {devlog_file.exists()}")
+    print(f"    日志文件: {devlog_file}")
+    print(f"    文件存在: {devlog_file.exists()}")
 
     # 第二次：创建新工具实例，应该自动加载已有日志
-    print("\n📖 第二次会话：自动加载已有日志...")
+    print("\n 第二次会话：自动加载已有日志...")
     tool2 = DevLogTool(
         session_id=session_id,
         agent_name="DemoAgent",
@@ -222,21 +222,21 @@ def demo_4_persistence():
         persistence_dir="memory/devlogs"
     )
 
-    print(f"   ✅ 已加载 {len(tool2.store.entries)} 条日志")
+    print(f"    已加载 {len(tool2.store.entries)} 条日志")
 
     # 生成摘要
     response = tool2.run({"action": "summary"})
     print(f"   {response.text}")
 
     # 继续添加日志
-    print("\n📝 继续添加日志...")
+    print("\n 继续添加日志...")
     tool2.run({
         "action": "append",
         "category": "solution",
         "content": "使用 gRPC 替代 HTTP REST"
     })
 
-    print(f"   ✅ 现在共有 {len(tool2.store.entries)} 条日志")
+    print(f"    现在共有 {len(tool2.store.entries)} 条日志")
 
 
 if __name__ == "__main__":
@@ -246,6 +246,6 @@ if __name__ == "__main__":
     demo_4_persistence()
 
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成")
+    print(" 所有示例运行完成")
     print("=" * 60)
 

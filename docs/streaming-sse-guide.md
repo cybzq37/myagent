@@ -1,6 +1,6 @@
 ﻿# 流式输出�?SSE 指南（Streaming & SSE�?
 
-## 📖 概述
+##  概述
 
 **流式输出**�?MyAgent 框架的实时响应能力，支持 SSE（Server-Sent Events）协议，实现打字机效果和实时进度反馈�?
 
@@ -13,7 +13,7 @@
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 1. 基本流式输出
 
@@ -96,7 +96,7 @@ async def chat_stream(message: str):
 
 ---
 
-## 💡 核心概念
+##  核心概念
 
 ### 8 种流式事�?
 
@@ -134,7 +134,7 @@ sse_text = event.to_sse()
 
 ---
 
-## 📝 使用指南
+##  使用指南
 
 ### 1. 完整�?FastAPI 示例
 
@@ -284,12 +284,12 @@ if __name__ == "__main__":
 
             currentEventSource.addEventListener('THINKING', (e) => {
                 const data = JSON.parse(e.data);
-                output.innerHTML += `<span class="thinking">💭 ${data.content}</span>\n`;
+                output.innerHTML += `<span class="thinking"> ${data.content}</span>\n`;
             });
 
             currentEventSource.addEventListener('TOOL_CALL_START', (e) => {
                 const data = JSON.parse(e.data);
-                output.innerHTML += `<span class="tool-call">🔧 ${data.tool_name}</span> `;
+                output.innerHTML += `<span class="tool-call"> ${data.tool_name}</span> `;
             });
 
             currentEventSource.addEventListener('TOOL_CALL_FINISH', (e) => {
@@ -333,7 +333,7 @@ if __name__ == "__main__":
 
 ---
 
-## 📊 实际案例
+##  实际案例
 
 ### 案例 1：实时代码分�?
 
@@ -343,15 +343,15 @@ if __name__ == "__main__":
 async def analyze_project():
     agent = ReActAgent("assistant", llm, tool_registry=registry)
     
-    print("🚀 开始分析项�?..")
+    print(" 开始分析项�?..")
     
     async for event in agent.arun_stream("分析项目结构"):
         if event.type == "STEP_START":
-            print(f"\n📍 步骤 {event.data['step']}")
+            print(f"\n 步骤 {event.data['step']}")
         
         elif event.type == "TOOL_CALL_START":
             tool = event.data['tool_name']
-            print(f"  🔧 {tool}...", end="", flush=True)
+            print(f"   {tool}...", end="", flush=True)
         
         elif event.type == "TOOL_CALL_FINISH":
             print(" �?)
@@ -360,16 +360,16 @@ async def analyze_project():
             print(event.data["content"], end="", flush=True)
         
         elif event.type == "AGENT_FINISH":
-            print("\n\n🎉 分析完成�?)
+            print("\n\n 分析完成�?)
 ```
 
 **输出示例�?*
 ```
-🚀 开始分析项�?..
+ 开始分析项�?..
 
-📍 步骤 1
-  🔧 Read... �?
-  🔧 Search... �?
+ 步骤 1
+   Read... �?
+   Search... �?
 
 项目结构如下�?
 - myagent/
@@ -377,12 +377,12 @@ async def analyze_project():
   - tools/
   - agents/
 
-📍 步骤 2
-  🔧 Read... �?
+ 步骤 2
+   Read... �?
 
 核心模块包括...
 
-🎉 分析完成�?
+ 分析完成�?
 ```
 
 ### 案例 2：聊天机器人
@@ -450,7 +450,7 @@ async def chat_stream(message: str, user_id: str = None):
 
 ---
 
-## 🎯 最佳实�?
+##  最佳实�?
 
 ### 1. 错误处理
 
@@ -506,7 +506,7 @@ async def event_generator():
 
 ---
 
-## 🔧 高级用法
+##  高级用法
 
 ### 1. 自定义事件过�?
 
@@ -560,7 +560,7 @@ async def event_generator():
 
 ---
 
-## 🔗 相关文档
+##  相关文档
 
 - [异步 Agent](./async-agent-guide.md) - arun_stream() 详细说明
 - [可观测性](./observability-guide.md) - 追踪流式执行
@@ -617,7 +617,7 @@ useEffect(() => {
 
 ---
 
-## 📈 性能指标
+##  性能指标
 
 ### 延迟对比
 

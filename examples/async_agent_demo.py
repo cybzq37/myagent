@@ -67,21 +67,21 @@ class CalculatorTool(Tool):
 
 async def on_agent_start(event: AgentEvent):
     """Agent 开始执行时触发"""
-    print(f"\n🚀 [{event.agent_name}] 开始执行")
+    print(f"\n [{event.agent_name}] 开始执行")
     print(f"   输入: {event.data.get('input_text')}")
 
 
 async def on_step_start(event: AgentEvent):
     """推理步骤开始时触发"""
     step = event.data.get('step', 0)
-    print(f"\n📍 步骤 {step} 开始")
+    print(f"\n 步骤 {step} 开始")
 
 
 async def on_tool_call(event: AgentEvent):
     """工具调用时触发"""
     tool_name = event.data.get('tool_name')
     args = event.data.get('args', {})
-    print(f"   🔧 调用工具: {tool_name}({args})")
+    print(f"    调用工具: {tool_name}({args})")
 
 
 async def on_agent_finish(event: AgentEvent):
@@ -90,7 +90,7 @@ async def on_agent_finish(event: AgentEvent):
     total_steps = event.data.get('total_steps', 0)
     total_tokens = event.data.get('total_tokens', 0)
     
-    print(f"\n✅ [{event.agent_name}] 执行完成")
+    print(f"\n [{event.agent_name}] 执行完成")
     print(f"   总步骤: {total_steps}")
     print(f"   总 Token: {total_tokens}")
     print(f"   结果: {result}")
@@ -100,7 +100,7 @@ async def on_error(event: AgentEvent):
     """发生错误时触发"""
     error = event.data.get('error')
     error_type = event.data.get('error_type')
-    print(f"\n❌ 错误: {error_type} - {error}")
+    print(f"\n 错误: {error_type} - {error}")
 
 
 # ==================== 主函数 ====================
@@ -171,11 +171,11 @@ async def stream_example():
     # 流式执行
     async for event in agent.arun_stream("你的问题"):
         if event.type == EventType.AGENT_START:
-            print(f"🚀 开始: {event.data}")
+            print(f" 开始: {event.data}")
         elif event.type == EventType.TOOL_CALL:
-            print(f"🔧 工具: {event.data['tool_name']}")
+            print(f" 工具: {event.data['tool_name']}")
         elif event.type == EventType.AGENT_FINISH:
-            print(f"✅ 完成: {event.data['result']}")
+            print(f" 完成: {event.data['result']}")
 
 
 if __name__ == "__main__":

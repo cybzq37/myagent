@@ -165,7 +165,7 @@ class SessionStore:
                     "metadata": data.get("metadata", {})
                 })
             except Exception as e:
-                print(f"⚠️ 警告：无法读取 {filepath}: {e}")
+                print(f"警告：无法读取 {filepath}: {e}")
 
         # 按保存时间倒序
         sessions.sort(key=lambda x: x.get("saved_at", ""), reverse=True)

@@ -29,7 +29,7 @@ class BlogProjectManager:
     def create_project_plan(self):
         """创建项目计划"""
         print("\n" + "="*60)
-        print("📋 创建博客系统开发计划")
+        print(" 创建博客系统开发计划")
         print("="*60)
         
         response = self.tool.run({
@@ -45,8 +45,8 @@ class BlogProjectManager:
             ]
         })
         
-        print(f"\n✅ 项目计划已创建")
-        print(f"📊 {response.text}")
+        print(f"\n 项目计划已创建")
+        print(f" {response.text}")
         return response
     
     def start_task(self, task_index: int):
@@ -75,8 +75,8 @@ class BlogProjectManager:
             ]
         })
         
-        print(f"\n🚀 开始任务: {todos[task_index].content}")
-        print(f"📊 {response.text}")
+        print(f"\n 开始任务: {todos[task_index].content}")
+        print(f" {response.text}")
         return response
     
     def complete_current_task(self):
@@ -87,7 +87,7 @@ class BlogProjectManager:
         for todo in todos:
             if todo.status == "in_progress":
                 todo.status = "completed"
-                print(f"\n✅ 完成任务: {todo.content}")
+                print(f"\n 完成任务: {todo.content}")
                 break
         
         # 提交更新
@@ -104,13 +104,13 @@ class BlogProjectManager:
             ]
         })
         
-        print(f"📊 {response.text}")
+        print(f" {response.text}")
         return response
     
     def simulate_development(self):
         """模拟开发过程"""
         print("\n" + "="*60)
-        print("🎬 模拟开发过程")
+        print(" 模拟开发过程")
         print("="*60)
         
         # 1. 创建计划
@@ -174,14 +174,14 @@ class BlogProjectManager:
         self.complete_current_task()
         
         print("\n" + "="*60)
-        print("🎉 项目开发完成！")
+        print(" 项目开发完成！")
         print("="*60)
 
 
 def demo_interrupt_and_resume():
     """演示中断和恢复"""
     print("\n" + "="*60)
-    print("🔄 演示中断和恢复")
+    print(" 演示中断和恢复")
     print("="*60)
     
     manager = BlogProjectManager()
@@ -190,44 +190,44 @@ def demo_interrupt_and_resume():
     manager.create_project_plan()
     
     # 开始第一个任务
-    print("\n📍 开始第一个任务...")
+    print("\n 开始第一个任务...")
     manager.start_task(0)
     
     # 模拟中断（保存状态）
-    print("\n⚠️ 模拟中断（网络断开、程序崩溃等）")
-    print("💾 任务状态已自动保存到 memory/todos/")
+    print("\n 模拟中断（网络断开、程序崩溃等）")
+    print(" 任务状态已自动保存到 memory/todos/")
     
     # 模拟恢复
-    print("\n🔄 恢复工作...")
+    print("\n 恢复工作...")
     from pathlib import Path
     todos_dir = Path("memory/todos")
     files = sorted(todos_dir.glob("todoList-*.json"))
     if files:
         latest_file = files[-1]
-        print(f"📂 加载最新状态: {latest_file.name}")
+        print(f" 加载最新状态: {latest_file.name}")
         
         # 创建新的管理器并加载状态
         manager2 = BlogProjectManager()
         manager2.tool.load_todos(str(latest_file))
         
-        print(f"✅ 状态已恢复")
-        print(f"📊 当前进度: {manager2.tool.current_todos.get_stats()}")
+        print(f" 状态已恢复")
+        print(f" 当前进度: {manager2.tool.current_todos.get_stats()}")
         
         # 继续工作
-        print("\n▶️ 继续完成当前任务...")
+        print("\n▶ 继续完成当前任务...")
         manager2.complete_current_task()
 
 
 def demo_multi_phase_project():
     """演示多阶段项目"""
     print("\n" + "="*60)
-    print("🎯 演示多阶段项目管理")
+    print(" 演示多阶段项目管理")
     print("="*60)
     
     tool = TodoWriteTool(project_root="./", persistence_dir="memory/todos")
     
     # 阶段 1：MVP 开发
-    print("\n📌 阶段 1：MVP 开发")
+    print("\n 阶段 1：MVP 开发")
     response = tool.run({
         "summary": "博客系统 MVP 开发",
         "todos": [
@@ -239,7 +239,7 @@ def demo_multi_phase_project():
     print(f"   {response.text}")
     
     # 完成 MVP
-    print("\n✅ MVP 开发完成")
+    print("\n MVP 开发完成")
     response = tool.run({
         "summary": "博客系统 MVP 开发",
         "todos": [
@@ -251,7 +251,7 @@ def demo_multi_phase_project():
     print(f"   {response.text}")
     
     # 阶段 2：功能增强
-    print("\n📌 阶段 2：功能增强")
+    print("\n 阶段 2：功能增强")
     response = tool.run({
         "summary": "博客系统功能增强",
         "todos": [
@@ -265,7 +265,7 @@ def demo_multi_phase_project():
 
 
 if __name__ == "__main__":
-    print("\n🚀 TodoWrite 实战案例：复杂项目开发")
+    print("\n TodoWrite 实战案例：复杂项目开发")
     
     # 案例 1：完整开发流程
     manager = BlogProjectManager()
@@ -278,6 +278,6 @@ if __name__ == "__main__":
     demo_multi_phase_project()
     
     print("\n" + "="*60)
-    print("✅ 所有案例演示完成")
+    print(" 所有案例演示完成")
     print("="*60)
 

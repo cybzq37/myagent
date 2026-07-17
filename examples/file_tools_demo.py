@@ -117,11 +117,11 @@ def demo_optimistic_locking():
         })
         
         if response.status == ToolStatus.ERROR:
-            print(f"   ✅ 成功检测到冲突！")
+            print(f"    成功检测到冲突！")
             print(f"   错误码: {response.error_info['code']}")
             print(f"   错误消息: {response.error_info['message']}")
         else:
-            print(f"   ❌ 未检测到冲突（不应该发生）")
+            print(f"    未检测到冲突（不应该发生）")
 
 
 def demo_multiedit():
@@ -175,6 +175,6 @@ if __name__ == "__main__":
     demo_multiedit()
     
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

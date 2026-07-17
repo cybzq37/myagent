@@ -190,7 +190,7 @@ class TodoWriteTool(Tool):
             if action == "clear":
                 # 清空任务列表
                 self.current_todos = TodoList(summary="")
-                recap = "✅ 任务列表已清空"
+                recap = "任务列表已清空"
 
                 return ToolResponse.success(
                     text=recap,
@@ -311,9 +311,9 @@ class TodoWriteTool(Tool):
         stats = self.current_todos.get_stats()
 
         if stats['total'] == 0:
-            return "📋 [0/0] 无活动任务"
+            return "[0/0] 无活动任务"
 
-        recap_parts = [f"📋 [{stats['completed']}/{stats['total']}]"]
+        recap_parts = [f" [{stats['completed']}/{stats['total']}]"]
 
         in_progress = self.current_todos.get_in_progress()
         if in_progress:
@@ -328,7 +328,7 @@ class TodoWriteTool(Tool):
             recap_parts.append(f"还有 {stats['pending'] - 3} 个...")
 
         if stats['completed'] == stats['total'] and stats['total'] > 0:
-            return f"✅ [{stats['completed']}/{stats['total']}] 所有任务已完成！"
+            return f"[{stats['completed']}/{stats['total']}] 所有任务已完成！"
 
         return ". ".join(recap_parts)
 

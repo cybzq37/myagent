@@ -1,5 +1,6 @@
 """LLM适配器 - 支持OpenAI、Anthropic、Gemini等不同接口格式"""
 
+import os
 import time
 import asyncio
 import json
@@ -117,6 +118,20 @@ class OpenAIAdapter(BaseLLMAdapter):
     - Thinking Models（o1、deepseek-reasoner等）
     """
 
+    def __init__(self, api_key: str, base_url: Optional[str], timeout: int, model: str):
+        # 读取 API 接口格式：chat_completions（默认）或 responses
+        # 通过环境变量 LLM_API_FORMAT 控制，适配只支持某一种接口的网关。
+        super().__init__(api_key, base_url, timeout, model)
+        fmt = os.getenv("LLM_API_FORMAT", "chat_completions").lower().strip()
+        if fmt not in ("chat_completions", "responses"):
+            fmt = "chat_completions"
+        self._api_format = fmt
+
+    @property
+    def _use_responses(self) -> bool:
+        """是否走 Responses API（client.responses.create）"""
+        return self._api_format == "responses"
+
     def create_client(self) -> Any:
         """创建OpenAI客户端"""
         from openai import OpenAI
@@ -136,9 +151,11 @@ class OpenAIAdapter(BaseLLMAdapter):
             base_url=self.base_url,
             timeout=self.timeout
         )
-    
+
     def invoke(self, messages: List[Dict], **kwargs) -> LLMResponse:
         """非流式调用"""
+        if self._use_responses:
+            return self._invoke_responses(messages, **kwargs)
         if not self._client:
             self._client = self.create_client()
         
@@ -186,9 +203,12 @@ class OpenAIAdapter(BaseLLMAdapter):
             
         except Exception as e:
             raise MyAgentException(f"OpenAI API调用失败: {str(e)}")
-    
+
     def stream_invoke(self, messages: List[Dict], **kwargs) -> Iterator[str]:
         """流式调用"""
+        if self._use_responses:
+            yield from self._stream_invoke_responses(messages, **kwargs)
+            return
         if not self._client:
             self._client = self.create_client()
         
@@ -248,6 +268,10 @@ class OpenAIAdapter(BaseLLMAdapter):
 
     async def astream_invoke(self, messages: List[Dict], **kwargs) -> AsyncIterator[str]:
         """真正的异步流式调用（使用 OpenAI 原生异步客户端）"""
+        if self._use_responses:
+            async for chunk in self._astream_invoke_responses(messages, **kwargs):
+                yield chunk
+            return
         if not self._async_client:
             self._async_client = self.create_async_client()
 
@@ -308,6 +332,8 @@ class OpenAIAdapter(BaseLLMAdapter):
     def invoke_with_tools(self, messages: List[Dict], tools: List[Dict],
                          tool_choice: Union[str, Dict] = "auto", **kwargs) -> LLMToolResponse:
         """工具调用（Function Calling）"""
+        if self._use_responses:
+            return self._invoke_with_tools_responses(messages, tools, tool_choice, **kwargs)
         if not self._client:
             self._client = self.create_client()
 
@@ -351,6 +377,245 @@ class OpenAIAdapter(BaseLLMAdapter):
 
         except Exception as e:
             raise MyAgentException(f"OpenAI Function Calling调用失败: {str(e)}")
+
+    # ==================== Responses API 实现 ====================
+    # 当 LLM_API_FORMAT=responses 时，走 OpenAI Responses API
+    # （client.responses.create），用于只支持该接口的网关。
+    # 与 chat.completions 的主要差异：
+    #   - 入参：input 接收消息列表；max_tokens → max_output_tokens
+    #   - 返回：output_text 取文本；output 数组含 function_call 项
+    #   - usage：input_tokens / output_tokens（而非 prompt_tokens / completion_tokens）
+
+    @staticmethod
+    def _convert_tools_to_responses_format(tools: List[Dict]) -> List[Dict]:
+        """把 chat completions 的嵌套工具 schema 拍平为 responses 格式。
+
+        chat completions: {"type": "function", "function": {"name": ..., "parameters": ...}}
+        responses:        {"type": "function", "name": ..., "parameters": ...}
+        """
+        converted = []
+        for tool in tools:
+            if tool.get("type") == "function" and "function" in tool:
+                func = tool["function"]
+                converted.append({
+                    "type": "function",
+                    "name": func["name"],
+                    "description": func.get("description", ""),
+                    "parameters": func.get("parameters", {"type": "object", "properties": {}}),
+                })
+            else:
+                converted.append(tool)
+        return converted
+
+    def _invoke_responses(self, messages: List[Dict], **kwargs) -> LLMResponse:
+        """Responses API 非流式调用"""
+        if not self._client:
+            self._client = self.create_client()
+
+        start_time = time.time()
+        try:
+            # max_tokens → max_output_tokens
+            max_output_tokens = kwargs.pop("max_tokens", None)
+            response = self._client.responses.create(
+                model=self.model,
+                input=messages,
+                max_output_tokens=max_output_tokens,
+                **kwargs
+            )
+
+            latency_ms = int((time.time() - start_time) * 1000)
+            content = response.output_text or ""
+            reasoning_content = None
+
+            # Thinking model：从 output 中提取 reasoning 项
+            if self._is_thinking_model(self.model):
+                for item in getattr(response, "output", []) or []:
+                    if getattr(item, "type", "") == "reasoning":
+                        summary = getattr(item, "summary", None) or []
+                        reasoning_content = "".join(
+                            getattr(s, "text", "") for s in summary
+                        )
+                        break
+
+            usage = {}
+            resp_usage = getattr(response, "usage", None)
+            if resp_usage:
+                usage = {
+                    "prompt_tokens": resp_usage.input_tokens,
+                    "completion_tokens": resp_usage.output_tokens,
+                    "total_tokens": resp_usage.total_tokens,
+                }
+
+            return LLMResponse(
+                content=content,
+                model=self.model,
+                usage=usage,
+                latency_ms=latency_ms,
+                reasoning_content=reasoning_content
+            )
+
+        except Exception as e:
+            raise MyAgentException(f"OpenAI Responses API调用失败: {str(e)}")
+
+    def _stream_invoke_responses(self, messages: List[Dict], **kwargs) -> Iterator[str]:
+        """Responses API 流式调用"""
+        if not self._client:
+            self._client = self.create_client()
+
+        start_time = time.time()
+        try:
+            max_output_tokens = kwargs.pop("max_tokens", None)
+            stream = self._client.responses.create(
+                model=self.model,
+                input=messages,
+                max_output_tokens=max_output_tokens,
+                stream=True,
+                **kwargs
+            )
+
+            reasoning_content = None
+            usage = {}
+
+            for event in stream:
+                etype = getattr(event, "type", "")
+                # 文本增量
+                if etype == "response.output_text.delta":
+                    delta = getattr(event, "delta", "")
+                    if delta:
+                        yield delta
+                # 推理过程增量（thinking model）
+                elif etype == "response.reasoning.delta" and self._is_thinking_model(self.model):
+                    delta = getattr(event, "delta", "")
+                    if delta:
+                        if reasoning_content is None:
+                            reasoning_content = ""
+                        reasoning_content += delta
+                # 流结束，提取 usage
+                elif etype == "response.completed":
+                    resp = getattr(event, "response", None)
+                    resp_usage = getattr(resp, "usage", None) if resp else None
+                    if resp_usage:
+                        usage = {
+                            "prompt_tokens": resp_usage.input_tokens,
+                            "completion_tokens": resp_usage.output_tokens,
+                            "total_tokens": resp_usage.total_tokens,
+                        }
+
+            latency_ms = int((time.time() - start_time) * 1000)
+            self.last_stats = StreamStats(
+                model=self.model,
+                usage=usage,
+                latency_ms=latency_ms,
+                reasoning_content=reasoning_content
+            )
+
+        except Exception as e:
+            raise MyAgentException(f"OpenAI Responses API流式调用失败: {str(e)}")
+
+    async def _astream_invoke_responses(self, messages: List[Dict], **kwargs) -> AsyncIterator[str]:
+        """Responses API 异步流式调用"""
+        if not self._async_client:
+            self._async_client = self.create_async_client()
+
+        start_time = time.time()
+        try:
+            max_output_tokens = kwargs.pop("max_tokens", None)
+            stream = await self._async_client.responses.create(
+                model=self.model,
+                input=messages,
+                max_output_tokens=max_output_tokens,
+                stream=True,
+                **kwargs
+            )
+
+            reasoning_content = None
+            usage = {}
+
+            async for event in stream:
+                etype = getattr(event, "type", "")
+                if etype == "response.output_text.delta":
+                    delta = getattr(event, "delta", "")
+                    if delta:
+                        yield delta
+                elif etype == "response.reasoning.delta" and self._is_thinking_model(self.model):
+                    delta = getattr(event, "delta", "")
+                    if delta:
+                        if reasoning_content is None:
+                            reasoning_content = ""
+                        reasoning_content += delta
+                elif etype == "response.completed":
+                    resp = getattr(event, "response", None)
+                    resp_usage = getattr(resp, "usage", None) if resp else None
+                    if resp_usage:
+                        usage = {
+                            "prompt_tokens": resp_usage.input_tokens,
+                            "completion_tokens": resp_usage.output_tokens,
+                            "total_tokens": resp_usage.total_tokens,
+                        }
+
+            latency_ms = int((time.time() - start_time) * 1000)
+            self.last_stats = StreamStats(
+                model=self.model,
+                usage=usage,
+                latency_ms=latency_ms,
+                reasoning_content=reasoning_content
+            )
+
+        except Exception as e:
+            raise MyAgentException(f"OpenAI Responses API异步流式调用失败: {str(e)}")
+
+    def _invoke_with_tools_responses(self, messages: List[Dict], tools: List[Dict],
+                                      tool_choice: Union[str, Dict] = "auto", **kwargs) -> LLMToolResponse:
+        """Responses API 工具调用（Function Calling）"""
+        if not self._client:
+            self._client = self.create_client()
+
+        start_time = time.time()
+        try:
+            responses_tools = self._convert_tools_to_responses_format(tools)
+            max_output_tokens = kwargs.pop("max_tokens", None)
+
+            response = self._client.responses.create(
+                model=self.model,
+                input=messages,
+                tools=responses_tools,
+                tool_choice=tool_choice,
+                max_output_tokens=max_output_tokens,
+                **kwargs
+            )
+
+            latency_ms = int((time.time() - start_time) * 1000)
+            content = response.output_text or ""
+
+            # 从 output 数组中提取 function_call 项
+            tool_calls = []
+            for item in getattr(response, "output", []) or []:
+                if getattr(item, "type", "") == "function_call":
+                    tool_calls.append(ToolCall(
+                        id=getattr(item, "call_id", "") or getattr(item, "id", ""),
+                        name=getattr(item, "name", ""),
+                        arguments=getattr(item, "arguments", "{}")
+                    ))
+
+            usage = {}
+            resp_usage = getattr(response, "usage", None)
+            if resp_usage:
+                usage = {
+                    "prompt_tokens": resp_usage.input_tokens,
+                    "completion_tokens": resp_usage.output_tokens,
+                    "total_tokens": resp_usage.total_tokens,
+                }
+
+            return LLMToolResponse(
+                content=content,
+                tool_calls=tool_calls,
+                model=self.model,
+                usage=usage,
+                latency_ms=latency_ms
+            )
+
+        except Exception as e:
+            raise MyAgentException(f"OpenAI Responses API Function Calling调用失败: {str(e)}")
 
 
 class AnthropicAdapter(BaseLLMAdapter):

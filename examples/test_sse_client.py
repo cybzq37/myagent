@@ -12,8 +12,8 @@ def test_sse_stream(input_text: str, agent_type: str = "react"):
         "agent_type": agent_type
     }
     
-    print(f"🚀 发送请求: {input_text}")
-    print(f"📝 Agent类型: {agent_type}")
+    print(f" 发送请求: {input_text}")
+    print(f" Agent类型: {agent_type}")
     print("-" * 60)
     
     try:
@@ -25,7 +25,7 @@ def test_sse_stream(input_text: str, agent_type: str = "react"):
         )
         
         if response.status_code != 200:
-            print(f"❌ 错误: {response.status_code} - {response.text}")
+            print(f" 错误: {response.status_code} - {response.text}")
             return
         
         # 逐行读取 SSE 事件
@@ -34,9 +34,9 @@ def test_sse_stream(input_text: str, agent_type: str = "react"):
                 print(line)
                 
     except KeyboardInterrupt:
-        print("\n⚠️ 用户中断")
+        print("\n 用户中断")
     except Exception as e:
-        print(f"❌ 异常: {e}")
+        print(f" 异常: {e}")
 
 if __name__ == "__main__":
     # 测试用例

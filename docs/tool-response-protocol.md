@@ -1,6 +1,6 @@
 ﻿# 工具响应协议（ToolResponse Protocol�?
 
-## 📖 概述
+##  概述
 
 **ToolResponse 协议**�?MyAgent 框架的标准化工具响应格式，解决了传统字符串返回的模糊性问题�?
 
@@ -36,7 +36,7 @@ def run(self, parameters: Dict[str, Any]) -> ToolResponse:
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 1. 创建成功响应
 
@@ -88,7 +88,7 @@ response = ToolResponse.partial(
 
 ---
 
-## 💡 核心概念
+##  核心概念
 
 ### 三种状�?
 
@@ -144,7 +144,7 @@ class ToolResponse:
 
 ---
 
-## 📝 使用指南
+##  使用指南
 
 ### 实现自定义工�?
 
@@ -230,7 +230,7 @@ if tool_response.status == ToolStatus.SUCCESS:
 
 elif tool_response.status == ToolStatus.PARTIAL:
     # 部分成功：提�?Agent 注意
-    print(f"⚠️ {tool_response.text}")
+    print(f" {tool_response.text}")
 
 elif tool_response.status == ToolStatus.ERROR:
     # 错误：明确提示错误码和信�?
@@ -240,7 +240,7 @@ elif tool_response.status == ToolStatus.ERROR:
 
 ---
 
-## 🔄 迁移指南
+##  迁移指南
 
 ### 旧工具（字符串返回）
 
@@ -291,7 +291,7 @@ class NewTool(Tool):
 
 ---
 
-## 📊 实际案例
+##  实际案例
 
 ### 案例 1：文件读取工�?
 
@@ -354,7 +354,7 @@ response = search_tool.run({"query": "python"})
 
 ---
 
-## 🎯 最佳实�?
+##  最佳实�?
 
 ### 1. 明确的错误码
 
@@ -405,7 +405,7 @@ return ToolResponse.success(
 
 ---
 
-## 🔗 相关文档
+##  相关文档
 
 - [熔断器机制](./circuit-breaker-guide.md) - 基于 ToolResponse 的错误判�?
 - [文件工具](./file_tools.md) - ReadTool、WriteTool 使用 ToolResponse

@@ -4,7 +4,7 @@
 
 ---
 
-## 📚 目录
+##  目录
 
 - [快速开始](#快速开�?
 - [三种实现方式](#三种实现方式)
@@ -15,7 +15,7 @@
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 安装框架
 
@@ -90,7 +90,7 @@ print(response)
 
 ---
 
-## 🎯 三种实现方式
+##  三种实现方式
 
 MyAgent 提供三种渐进式的工具实现方式，适应不同复杂度的需求：
 
@@ -273,7 +273,7 @@ registry.register_tool(db_tool)
 
 ---
 
-## 📝 工具模板
+##  工具模板
 
 我们提供了三个开箱即用的模板，位�?`examples/custom_tools/` 目录�?
 
@@ -283,7 +283,7 @@ registry.register_tool(db_tool)
 
 ---
 
-## 🎓 实战示例
+##  实战示例
 
 框架提供�?4 个真实场景的示例工具，位�?`examples/custom_tools/` 目录�?
 
@@ -559,7 +559,7 @@ class ComposeTool(Tool):
 
 ---
 
-## 📚 相关文档
+##  相关文档
 
 - [工具响应协议](./tool-response-protocol.md) - ToolResponse 详细说明
 - [文件操作工具](./file_tools.md) - 内置文件工具示例
@@ -567,7 +567,7 @@ class ComposeTool(Tool):
 
 ---
 
-## 🤝 贡献你的工具
+##  贡献你的工具
 
 如果你开发了通用的工具，欢迎贡献�?MyAgent 框架�?
 
@@ -578,7 +578,7 @@ class ComposeTool(Tool):
 
 ---
 
-## 📞 获取帮助
+##  获取帮助
 
 - GitHub Issues: https://github.com/your-repo/hello-agents/issues
 - 文档: https://hello-agents.readthedocs.io

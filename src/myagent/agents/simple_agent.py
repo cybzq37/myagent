@@ -140,7 +140,7 @@ class SimpleAgent(Agent):
                     **kwargs
                 )
             except Exception as e:
-                print(f"❌ LLM 调用失败: {e}")
+                print(f"LLM 调用失败: {e}")
                 if trace_logger:
                     trace_logger.log_event(
                         "error",
@@ -201,7 +201,7 @@ class SimpleAgent(Agent):
                 try:
                     arguments = json.loads(tool_call.arguments)
                 except json.JSONDecodeError as e:
-                    print(f"❌ 工具参数解析失败: {e}")
+                    print(f"工具参数解析失败: {e}")
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_call_id,

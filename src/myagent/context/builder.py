@@ -279,7 +279,7 @@ class ContextBuilder:
         
         # 简单截断策略（保留前N个token）
         # 实际应用中可用LLM做高保真摘要
-        print(f"⚠️ 上下文超预算 ({current_tokens} > {available_tokens})，执行截断")
+        print(f"上下文超预算 ({current_tokens} > {available_tokens})，执行截断")
         
         # 按段落截断，保留结构
         lines = context.split("\n")

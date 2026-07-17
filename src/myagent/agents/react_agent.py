@@ -113,24 +113,24 @@ class ReActAgent(Agent):
 
         except KeyboardInterrupt:
             # Ctrl+C 时自动保存
-            print("\n⚠️ 用户中断，自动保存会话...")
+            print("\n 用户中断，自动保存会话...")
             if self.session_store:
                 try:
                     filepath = self.save_session("session-interrupted")
-                    print(f"✅ 会话已保存: {filepath}")
+                    print(f"会话已保存: {filepath}")
                 except Exception as e:
-                    print(f"❌ 保存失败: {e}")
+                    print(f"保存失败: {e}")
             raise
 
         except Exception as e:
             # 错误时也尝试保存
-            print(f"\n❌ 发生错误: {e}")
+            print(f"\n 发生错误: {e}")
             if self.session_store:
                 try:
                     filepath = self.save_session("session-error")
-                    print(f"✅ 会话已保存: {filepath}")
+                    print(f"会话已保存: {filepath}")
                 except Exception as save_error:
-                    print(f"❌ 保存失败: {save_error}")
+                    print(f"保存失败: {save_error}")
             raise
 
     def _run_impl(self, input_text: str, session_start_time, **kwargs) -> str:
@@ -161,7 +161,7 @@ class ReActAgent(Agent):
                 {"role": "user", "content": input_text}
             )
 
-        print(f"\n🤖 {self.name} 开始处理问题: {input_text}")
+        print(f"\n {self.name} 开始处理问题: {input_text}")
 
         while current_step < self.max_steps:
             current_step += 1
@@ -179,7 +179,7 @@ class ReActAgent(Agent):
                     **kwargs
                 )
             except Exception as e:
-                print(f"❌ LLM 调用失败: {e}")
+                print(f"LLM 调用失败: {e}")
                 if self.trace_logger:
                     self.trace_logger.log_event(
                         "error",
@@ -216,7 +216,7 @@ class ReActAgent(Agent):
             if not tool_calls:
                 # 没有工具调用，直接返回文本响应
                 final_answer = response.content or "抱歉，我无法回答这个问题。"
-                print(f"💬 直接回复: {final_answer}")
+                print(f"直接回复: {final_answer}")
 
                 # 保存到历史记录
                 self.add_message(Message(input_text, "user"))
@@ -262,7 +262,7 @@ class ReActAgent(Agent):
                 try:
                     arguments = json.loads(tool_call.arguments)
                 except json.JSONDecodeError as e:
-                    print(f"❌ 工具参数解析失败: {e}")
+                    print(f"工具参数解析失败: {e}")
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_call_id,
@@ -285,7 +285,7 @@ class ReActAgent(Agent):
                 # 检查是否是内置工具
                 if tool_name in self._builtin_tools:
                     result = self._handle_builtin_tool(tool_name, arguments)
-                    print(f"🔧 {tool_name}: {result['content']}")
+                    print(f"{tool_name}: {result['content']}")
 
                     # 记录工具结果
                     if self.trace_logger:
@@ -303,7 +303,7 @@ class ReActAgent(Agent):
                     # 检查是否是 Finish
                     if tool_name == "Finish" and result.get("finished"):
                         final_answer = result["final_answer"]
-                        print(f"🎉 最终答案: {final_answer}")
+                        print(f"最终答案: {final_answer}")
 
                         # 保存到历史记录
                         self.add_message(Message(input_text, "user"))
@@ -332,7 +332,7 @@ class ReActAgent(Agent):
                     })
                 else:
                     # 用户工具
-                    print(f"🎬 调用工具: {tool_name}({arguments})")
+                    print(f"调用工具: {tool_name}({arguments})")
 
                     # 执行工具（使用基类方法，支持字典参数）
                     result = self._execute_tool_call(tool_name, arguments)
@@ -350,10 +350,10 @@ class ReActAgent(Agent):
                         )
 
                     # 检查是否是错误
-                    if result.startswith("❌"):
+                    if result.startswith(""):
                         print(result)
                     else:
-                        print(f"👀 观察: {result}")
+                        print(f"观察: {result}")
 
                     # 添加工具结果到消息
                     messages.append({
@@ -363,7 +363,7 @@ class ReActAgent(Agent):
                     })
 
         # 达到最大步数
-        print("⏰ 已达到最大步数，流程终止。")
+        print("已达到最大步数，流程终止。")
         final_answer = "抱歉，我无法在限定步数内完成这个任务。"
 
         # 保存到历史记录
@@ -534,7 +534,7 @@ class ReActAgent(Agent):
                     {"role": "user", "content": input_text}
                 )
 
-            print(f"\n🤖 {self.name} 开始处理问题: {input_text}")
+            print(f"\n {self.name} 开始处理问题: {input_text}")
 
             while current_step < self.max_steps:
                 current_step += 1
@@ -556,7 +556,7 @@ class ReActAgent(Agent):
                         **kwargs
                     )
                 except Exception as e:
-                    print(f"❌ LLM 调用失败: {e}")
+                    print(f"LLM 调用失败: {e}")
                     await self._emit_event(
                         EventType.AGENT_ERROR,
                         on_error,
@@ -590,7 +590,7 @@ class ReActAgent(Agent):
                 if not tool_calls:
                     # 没有工具调用，直接返回
                     final_answer = response.content or "抱歉，我无法回答这个问题。"
-                    print(f"💬 直接回复: {final_answer}")
+                    print(f"直接回复: {final_answer}")
 
                     self.add_message(Message(input_text, "user"))
                     self.add_message(Message(final_answer, "assistant"))
@@ -646,7 +646,7 @@ class ReActAgent(Agent):
                 for tool_name, tool_call_id, result in tool_results:
                     if tool_name == "Finish" and result.get("finished"):
                         final_answer = result["final_answer"]
-                        print(f"🎉 最终答案: {final_answer}")
+                        print(f"最终答案: {final_answer}")
 
                         self.add_message(Message(input_text, "user"))
                         self.add_message(Message(final_answer, "assistant"))
@@ -690,7 +690,7 @@ class ReActAgent(Agent):
                 )
 
             # 达到最大步数
-            print("⏰ 已达到最大步数，流程终止。")
+            print("已达到最大步数，流程终止。")
             final_answer = "抱歉，我无法在限定步数内完成这个任务。"
 
             self.add_message(Message(input_text, "user"))
@@ -784,7 +784,7 @@ class ReActAgent(Agent):
             )
 
             result = self._handle_builtin_tool(tool_name, arguments)
-            print(f"🔧 {tool_name}: {result['content']}")
+            print(f"{tool_name}: {result['content']}")
 
             # 记录工具结果
             if self.trace_logger:
@@ -828,12 +828,12 @@ class ReActAgent(Agent):
                         step=current_step
                     )
 
-                    print(f"🎬 调用工具: {tool_name}({arguments})")
+                    print(f"调用工具: {tool_name}({arguments})")
 
                     # 异步执行工具
                     tool = self.tool_registry.get_tool(tool_name)
                     if not tool:
-                        result_content = f"❌ 工具 {tool_name} 不存在"
+                        result_content = f" 工具 {tool_name} 不存在"
                     else:
                         try:
                             tool_response = await tool.arun_with_timing(arguments)
@@ -846,7 +846,7 @@ class ReActAgent(Agent):
                             )
                             result_content = truncate_result.get('preview', result_content)
                         except Exception as e:
-                            result_content = f"❌ 工具执行失败: {str(e)}"
+                            result_content = f" 工具执行失败: {str(e)}"
 
                     # 记录工具结果
                     if self.trace_logger:
@@ -860,10 +860,10 @@ class ReActAgent(Agent):
                             step=current_step
                         )
 
-                    if result_content.startswith("❌"):
+                    if result_content.startswith(""):
                         print(result_content)
                     else:
-                        print(f"👀 观察: {result_content}")
+                        print(f"观察: {result_content}")
 
                     return (tool_name, tool_call_id, {"content": result_content})
 
@@ -922,7 +922,7 @@ class ReActAgent(Agent):
             current_step = 0
             final_answer = None
 
-            print(f"\n🤖 {self.name} 开始处理问题: {input_text}")
+            print(f"\n {self.name} 开始处理问题: {input_text}")
 
             while current_step < self.max_steps:
                 current_step += 1
@@ -962,7 +962,7 @@ class ReActAgent(Agent):
 
                 except Exception as e:
                     error_msg = f"LLM 调用失败: {str(e)}"
-                    print(f"❌ {error_msg}")
+                    print(f"{error_msg}")
 
                     yield StreamEvent.create(
                         StreamEventType.ERROR,
@@ -1079,7 +1079,7 @@ class ReActAgent(Agent):
 
                 except Exception as e:
                     error_msg = f"工具执行失败: {str(e)}"
-                    print(f"❌ {error_msg}")
+                    print(f"{error_msg}")
 
                     yield StreamEvent.create(
                         StreamEventType.ERROR,
@@ -1169,11 +1169,11 @@ class ReActAgent(Agent):
             # 执行内置工具
             if tool_name == "Thought":
                 reasoning = arguments.get("reasoning", "")
-                print(f"💭 思考: {reasoning}")
+                print(f"思考: {reasoning}")
                 result_content = f"已记录推理过程: {reasoning}"
             elif tool_name == "Finish":
                 answer = arguments.get("answer", "")
-                print(f"✅ 最终答案: {answer}")
+                print(f"最终答案: {answer}")
                 result_content = answer
             else:
                 result_content = f"未知的内置工具: {tool_name}"
@@ -1205,12 +1205,12 @@ class ReActAgent(Agent):
                         step=current_step
                     )
 
-                    print(f"🔧 调用工具: {tool_name}({arguments})")
+                    print(f"调用工具: {tool_name}({arguments})")
 
                     # 异步执行工具
                     tool = self.tool_registry.get_tool(tool_name)
                     if not tool:
-                        result_content = f"❌ 工具 {tool_name} 不存在"
+                        result_content = f" 工具 {tool_name} 不存在"
                     else:
                         try:
                             tool_response = await tool.arun_with_timing(arguments)
@@ -1223,12 +1223,12 @@ class ReActAgent(Agent):
                             )
                             result_content = truncate_result.get('preview', result_content)
                         except Exception as e:
-                            result_content = f"❌ 工具执行失败: {str(e)}"
+                            result_content = f" 工具执行失败: {str(e)}"
 
-                    if result_content.startswith("❌"):
+                    if result_content.startswith(""):
                         print(result_content)
                     else:
-                        print(f"👀 观察: {result_content}")
+                        print(f"观察: {result_content}")
 
                     return (tool_name, tool_call_id, {"content": result_content})
 

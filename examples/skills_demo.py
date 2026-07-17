@@ -69,7 +69,7 @@ pdftotext input.pdf output.txt
             print(f"  内容长度: {len(skill.body)} 字符")
             print(f"  内容预览: {skill.body[:100]}...")
         
-        print("\n✅ 技能加载器测试完成")
+        print("\n 技能加载器测试完成")
 
 
 def demo_skill_tool():
@@ -123,7 +123,7 @@ description: Perform comprehensive code reviews
         print(f"  状态: {response.status.value}")
         print(f"  错误码: {response.error_info['code']}")
         
-        print("\n✅ 技能工具测试完成")
+        print("\n 技能工具测试完成")
 
 
 def demo_zero_config_activation():
@@ -154,14 +154,14 @@ def demo_zero_config_activation():
         print(f"\n已注册工具: {tools}")
         
         if "Skill" in tools:
-            print("✅ Skill 工具已自动注册")
+            print(" Skill 工具已自动注册")
         else:
-            print("⚠️ Skill 工具未注册（可能 skills 目录为空）")
+            print(" Skill 工具未注册（可能 skills 目录为空）")
     else:
-        print(f"\n⚠️ skills 目录不存在: {skills_dir.absolute()}")
+        print(f"\n skills 目录不存在: {skills_dir.absolute()}")
         print("   创建 skills 目录并添加 SKILL.md 文件即可自动激活")
     
-    print("\n✅ 零配置激活测试完成")
+    print("\n 零配置激活测试完成")
 
 
 def demo_skill_with_arguments():
@@ -211,7 +211,7 @@ Process the arguments above and generate output.
         assert "Target: Python code" in response.text
         assert "Performance optimization" in response.text
         
-        print("\n✅ 带参数技能测试完成")
+        print("\n 带参数技能测试完成")
 
 
 def demo_skill_resources():
@@ -266,7 +266,7 @@ Check the scripts/ and examples/ folders for templates.
         assert len(skill.examples) == 1
         assert len(skill.references) == 1
         
-        print("\n✅ 技能资源测试完成")
+        print("\n 技能资源测试完成")
 
 
 if __name__ == "__main__":
@@ -277,6 +277,6 @@ if __name__ == "__main__":
     demo_skill_resources()
     
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

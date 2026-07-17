@@ -55,7 +55,7 @@ def demo_token_counter():
     stats = counter.get_cache_stats()
     print(f"\n缓存统计: {stats}")
 
-    print("\n✅ Token 计数器测试完成")
+    print("\n Token 计数器测试完成")
 
 
 def demo_simple_summary():
@@ -88,7 +88,7 @@ def demo_simple_summary():
     summary = agent._generate_simple_summary(history)
 
     print(f"\n简单摘要:\n{summary}")
-    print("\n✅ 简单摘要测试完成")
+    print("\n 简单摘要测试完成")
 
 
 def demo_smart_summary():
@@ -134,7 +134,7 @@ def demo_smart_summary():
     summary = agent._generate_smart_summary(history)
 
     print(f"\n智能摘要:\n{summary}")
-    print("\n✅ 智能摘要测试完成")
+    print("\n 智能摘要测试完成")
 
 
 def demo_history_management():
@@ -164,7 +164,7 @@ def demo_history_management():
     print(f"第一条消息角色: {compressed_history[0].role}")
     print(f"摘要内容: {compressed_history[0].content[:50]}...")
 
-    print("\n✅ 历史管理测试完成")
+    print("\n 历史管理测试完成")
 
 
 def demo_observation_truncator():
@@ -199,7 +199,7 @@ def demo_observation_truncator():
         if result.get('full_output_path'):
             saved_path = Path(result['full_output_path'])
             assert saved_path.exists()
-            print(f"\n✅ 完整输出已保存到: {saved_path.name}")
+            print(f"\n 完整输出已保存到: {saved_path.name}")
 
 
 def demo_session_serialization():
@@ -236,7 +236,7 @@ def demo_session_serialization():
     assert len(original) == len(restored)
     assert original[0].content == restored[0].content
     
-    print("\n✅ 会话序列化测试完成")
+    print("\n 会话序列化测试完成")
 
 
 def demo_round_boundaries():
@@ -266,11 +266,11 @@ def demo_round_boundaries():
     print(f"轮次边界: {boundaries}")
     print(f"完整轮次数: {rounds}")
     
-    print("\n✅ 轮次边界检测完成")
+    print("\n 轮次边界检测完成")
 
 
 if __name__ == "__main__":
-    print("\n🚀 上下文工程示例演示\n")
+    print("\n 上下文工程示例演示\n")
 
     # 运行所有示例
     demo_token_counter()
@@ -282,6 +282,6 @@ if __name__ == "__main__":
     demo_round_boundaries()
 
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

@@ -117,8 +117,8 @@ class SkillTool(Tool):
 {resources_hint}
 </skill-loaded>
 
-✅ 技能已加载：{skill.name}
-📝 描述：{skill.description}
+ 技能已加载：{skill.name}
+ 描述：{skill.description}
 
 请严格遵循上述技能说明来完成用户任务。"""
 

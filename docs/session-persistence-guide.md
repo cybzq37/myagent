@@ -4,7 +4,7 @@
 
 ---
 
-## 📖 概述
+##  概述
 
 MyAgent 的会话持久化功能允许你：
 
@@ -16,7 +16,7 @@ MyAgent 的会话持久化功能允许你：
 
 ---
 
-## 🚀 快速开�?
+##  快速开�?
 
 ### 基本使用
 
@@ -45,7 +45,7 @@ for s in sessions:
 
 ---
 
-## 📋 核心功能
+##  核心功能
 
 ### 1. 保存会话
 
@@ -101,7 +101,7 @@ if agent.session_store:
 
 ---
 
-## ⚙️ 配置选项
+##  配置选项
 
 ### 基本配置
 
@@ -150,7 +150,7 @@ agent = SimpleAgent("assistant", llm, config=config)
 
 ---
 
-## 🛡�?异常保护（ReActAgent�?
+## �?异常保护（ReActAgent�?
 
 ReActAgent 自动在异常时保存会话�?
 
@@ -175,7 +175,7 @@ except Exception as e:
 
 ---
 
-## 🔍 环境一致性检�?
+##  环境一致性检�?
 
 恢复会话时，框架会自动检查环境是否发生变化：
 
@@ -190,7 +190,7 @@ except Exception as e:
 agent.load_session("memory/sessions/my-session.json")
 
 # 如果配置不一致，会输出警告：
-# ⚠️ 环境配置不一致：
+#  环境配置不一致：
 #   - 模型变化: gpt-4 �?gpt-3.5-turbo
 ```
 
@@ -202,13 +202,13 @@ agent.load_session("memory/sessions/my-session.json")
 agent.load_session("memory/sessions/my-session.json")
 
 # 如果工具定义变化，会输出警告�?
-# ⚠️ 工具定义已变�?
+#  工具定义已变�?
 #   建议：建议重新读取文�?
 ```
 
 ---
 
-## 📦 会话文件结构
+##  会话文件结构
 
 会话文件是标准的 JSON 格式�?
 
@@ -259,7 +259,7 @@ agent.load_session("memory/sessions/my-session.json")
 
 ---
 
-## 💡 使用场景
+##  使用场景
 
 ### 场景 1：长时间任务断点续跑
 
@@ -356,7 +356,7 @@ for s in sessions:
 
 ---
 
-## 🔧 高级用法
+##  高级用法
 
 ### 1. 自定义会话目�?
 
@@ -419,7 +419,7 @@ if agent._session_metadata["total_steps"] > 10:
 
 ---
 
-## ⚠️ 注意事项
+##  注意事项
 
 ### 1. 会话文件大小
 
@@ -447,7 +447,7 @@ if agent._session_metadata["total_steps"] > 10:
 
 ---
 
-## 📚 API 参�?
+##  API 参�?
 
 ### Agent 方法
 
@@ -511,7 +511,7 @@ if agent._session_metadata["total_steps"] > 10:
 
 ---
 
-## 🎯 最佳实�?
+##  最佳实�?
 
 1. **定期保存**：长时间任务建议启用自动保存
 2. **命名规范**：使用有意义的会话名称（�?`project-analysis-2025-01-19`�?
@@ -521,7 +521,7 @@ if agent._session_metadata["total_steps"] > 10:
 
 ---
 
-## 🔗 相关文档
+##  相关文档
 
 - [上下文工程优化](../refine/02-context-engineering.md)
 - [乐观锁机制](../refine/08-optimistic-locking.md)

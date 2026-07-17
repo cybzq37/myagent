@@ -65,7 +65,7 @@ def demo_basic_save_load():
         assert len(history) == 4
         assert history[0].content == "你好"
         
-        print("\n✅ 基本保存和加载测试完成")
+        print("\n 基本保存和加载测试完成")
 
 
 def demo_list_sessions():
@@ -102,7 +102,7 @@ def demo_list_sessions():
             print(f"  文件路径: {Path(session['filepath']).name}")
         
         assert len(sessions) == 3
-        print("\n✅ 列出会话测试完成")
+        print("\n 列出会话测试完成")
 
 
 def demo_consistency_check():
@@ -143,7 +143,7 @@ def demo_consistency_check():
         # 会话仍然可以加载，但会有警告
         assert len(agent2.get_history()) == 1
         
-        print("\n✅ 环境一致性检查完成")
+        print("\n 环境一致性检查完成")
 
 
 def demo_auto_save():
@@ -179,7 +179,7 @@ def demo_auto_save():
         # 至少应该有 1 个自动保存文件
         assert len(session_files) >= 1
         
-        print("\n✅ 自动保存测试完成")
+        print("\n 自动保存测试完成")
 
 
 def demo_metadata_tracking():
@@ -224,7 +224,7 @@ def demo_metadata_tracking():
         print(f"  总步数: {metadata.get('total_steps', 0)}")
         print(f"  持续时间: {metadata.get('duration_seconds', 0)} 秒")
         
-        print("\n✅ 元数据追踪测试完成")
+        print("\n 元数据追踪测试完成")
 
 
 if __name__ == "__main__":
@@ -235,6 +235,6 @@ if __name__ == "__main__":
     demo_metadata_tracking()
     
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

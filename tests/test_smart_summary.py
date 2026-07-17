@@ -25,8 +25,8 @@ def agent_with_smart_summary(llm):
         min_retain_rounds=3,
         compression_threshold=0.5,
         context_window=8000,
-        summary_llm_provider="deepseek",
-        summary_llm_model="deepseek-chat",
+        summary_llm_provider=os.getenv("LLM_PROVIDER", "openai"),
+        summary_llm_model=os.getenv("LLM_MODEL_ID"),
         summary_max_tokens=800,
         summary_temperature=0.3
     )
@@ -67,7 +67,7 @@ def test_simple_summary_generation(agent_with_simple_summary):
     assert "用户消息：2 条" in summary
     assert "助手消息：2 条" in summary
     assert "总消息数：4 条" in summary
-    print("✅ 简单摘要生成测试通过")
+    print("简单摘要生成测试通过")
 
 
 def test_smart_summary_generation(agent_with_smart_summary):
@@ -98,7 +98,7 @@ def test_smart_summary_generation(agent_with_smart_summary):
     assert "已压缩" in summary
     # 智能摘要应该比简单摘要更长
     assert len(summary) > 100
-    print("✅ 智能摘要生成测试通过")
+    print("智能摘要生成测试通过")
 
 
 def test_token_counter_basic(agent_with_simple_summary):
@@ -115,7 +115,7 @@ def test_token_counter_basic(agent_with_simple_summary):
     # 再次计算应该使用缓存（结果相同）
     tokens2 = agent_with_simple_summary.token_counter.count_message(msg)
     assert tokens == tokens2
-    print("✅ Token 计数器基本功能测试通过")
+    print("Token 计数器基本功能测试通过")
 
 
 def test_token_counter_incremental(agent_with_simple_summary):
@@ -140,7 +140,7 @@ def test_token_counter_incremental(agent_with_simple_summary):
     # 清空历史
     agent_with_simple_summary.clear_history()
     assert agent_with_simple_summary._history_token_count == 0
-    print("✅ 增量 Token 计算测试通过")
+    print("增量 Token 计算测试通过")
 
 
 if __name__ == "__main__":

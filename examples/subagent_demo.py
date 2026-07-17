@@ -38,7 +38,7 @@ def example_1_basic_subagent():
     # 主 Agent 可以直接使用 Task 工具
     # 框架会自动注册 TaskTool
     print("\n主 Agent 可用工具:", registry.list_tools())
-    print("✅ Task 工具已自动注册")
+    print(" Task 工具已自动注册")
 
 
 def example_2_manual_subagent():
@@ -129,7 +129,7 @@ def example_3_custom_factory():
     )
     registry.register_tool(task_tool)
 
-    print("\n✅ 自定义 TaskTool 已注册")
+    print("\n 自定义 TaskTool 已注册")
     print("  - react/plan 类型 → 轻量模型（节省成本）")
     print("  - reflection/simple 类型 → 主模型（保证质量）")
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         example_4_different_agent_types()
         example_5_tool_filtering()
     except Exception as e:
-        print(f"\n❌ 示例执行出错: {e}")
+        print(f"\n 示例执行出错: {e}")
         import traceback
         traceback.print_exc()
 

@@ -78,9 +78,9 @@ def demo_basic_logging():
     assert jsonl_path.exists()
     assert html_path.exists()
 
-    print(f"\n✅ JSONL 文件: {jsonl_path.name}")
-    print(f"✅ HTML 文件: {html_path.name}")
-    print(f"✅ 事件数量: {len(logger._events)}")
+    print(f"\n JSONL 文件: {jsonl_path.name}")
+    print(f" HTML 文件: {html_path.name}")
+    print(f" 事件数量: {len(logger._events)}")
 
 
 def demo_sanitization():
@@ -120,7 +120,7 @@ def demo_sanitization():
 
     # 确保文件正确关闭
     logger.finalize()
-    print("\n✅ 敏感信息脱敏测试完成")
+    print("\n 敏感信息脱敏测试完成")
 
 
 def demo_error_tracking():
@@ -170,7 +170,7 @@ def demo_error_tracking():
     # 统计错误
     error_events = [e for e in logger._events if "error" in str(e).lower()]
     print(f"\n错误事件数: {len(error_events)}")
-    print("✅ 错误追踪测试完成")
+    print(" 错误追踪测试完成")
 
 
 def demo_statistics():
@@ -215,7 +215,7 @@ def demo_statistics():
     print(f"  会话时长: {stats['duration_seconds']:.2f}s")
 
     logger.finalize()
-    print("\n✅ 统计信息测试完成")
+    print("\n 统计信息测试完成")
 
 
 if __name__ == "__main__":
@@ -225,6 +225,6 @@ if __name__ == "__main__":
     demo_statistics()
     
     print("\n" + "=" * 60)
-    print("✅ 所有示例运行完成！")
+    print(" 所有示例运行完成！")
     print("=" * 60)
 

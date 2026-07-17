@@ -104,7 +104,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🤖 MyAgent SSE 流式输出示例</h1>
+        <h1> MyAgent SSE 流式输出示例</h1>
         
         <div class="input-group">
             <label for="agentType">Agent 类型：</label>
@@ -227,21 +227,21 @@
                 currentText += data.data.chunk;
                 appendEvent(type, `${data.data.chunk}`, data.timestamp);
             } else if (type === 'agent_start') {
-                appendEvent(type, `🚀 Agent 开始: ${data.data.input_text}`, data.timestamp);
+                appendEvent(type, ` Agent 开始: ${data.data.input_text}`, data.timestamp);
             } else if (type === 'agent_finish') {
-                appendEvent(type, `✅ Agent 完成\n最终答案: ${data.data.result}`, data.timestamp);
+                appendEvent(type, ` Agent 完成\n最终答案: ${data.data.result}`, data.timestamp);
             } else if (type === 'step_start') {
-                appendEvent(type, `📍 步骤 ${data.data.step || ''} 开始: ${data.data.description || ''}`, data.timestamp);
+                appendEvent(type, ` 步骤 ${data.data.step || ''} 开始: ${data.data.description || ''}`, data.timestamp);
             } else if (type === 'step_finish') {
-                appendEvent(type, `✓ 步骤 ${data.data.step || ''} 完成`, data.timestamp);
+                appendEvent(type, ` 步骤 ${data.data.step || ''} 完成`, data.timestamp);
             } else if (type === 'tool_call_start') {
-                appendEvent(type, `🔧 调用工具: ${data.data.tool_name}`, data.timestamp);
+                appendEvent(type, ` 调用工具: ${data.data.tool_name}`, data.timestamp);
             } else if (type === 'tool_call_finish') {
-                appendEvent(type, `👀 工具结果: ${data.data.result}`, data.timestamp);
+                appendEvent(type, ` 工具结果: ${data.data.result}`, data.timestamp);
             } else if (type === 'thinking') {
-                appendEvent(type, `💭 思考: ${data.data.chunk}`, data.timestamp);
+                appendEvent(type, ` 思考: ${data.data.chunk}`, data.timestamp);
             } else if (type === 'error') {
-                appendEvent(type, `❌ 错误: ${data.data.error}`, data.timestamp);
+                appendEvent(type, ` 错误: ${data.data.error}`, data.timestamp);
             }
             
             // 自动滚动到底部

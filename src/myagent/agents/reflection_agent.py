@@ -24,7 +24,7 @@ class Memory:
     def add_record(self, record_type: str, content: str):
         """向记忆中添加一条新记录"""
         self.records.append({"type": record_type, "content": content})
-        print(f"📝 记忆已更新，新增一条 '{record_type}' 记录。")
+        print(f"记忆已更新，新增一条 '{record_type}' 记录。")
 
     def get_trajectory(self) -> str:
         """将所有记忆记录格式化为一个连贯的字符串文本"""
@@ -116,7 +116,7 @@ class ReflectionAgent(Agent):
         Returns:
             最终优化后的结果
         """
-        print(f"\n🤖 {self.name} 开始处理任务: {input_text}")
+        print(f"\n {self.name} 开始处理任务: {input_text}")
 
         # 重置记忆
         self.memory = Memory()
@@ -138,7 +138,7 @@ class ReflectionAgent(Agent):
 
             # b. 检查是否需要停止
             if "无需改进" in feedback or "no need for improvement" in feedback.lower():
-                print("\n✅ 反思认为结果已无需改进，任务完成。")
+                print("\n 反思认为结果已无需改进，任务完成。")
                 break
 
             # c. 优化
@@ -230,7 +230,7 @@ class ReflectionAgent(Agent):
                     **kwargs
                 )
             except Exception as e:
-                print(f"❌ LLM 调用失败: {e}")
+                print(f"LLM 调用失败: {e}")
                 break
 
             # 处理工具调用
@@ -264,7 +264,7 @@ class ReflectionAgent(Agent):
                 try:
                     arguments = json.loads(tool_call.arguments)
                 except json.JSONDecodeError as e:
-                    print(f"❌ 工具参数解析失败: {e}")
+                    print(f"工具参数解析失败: {e}")
                     messages.append({
                         "role": "tool",
                         "tool_call_id": tool_call_id,

@@ -26,7 +26,7 @@ def demo_1_basic_usage():
     tool = TodoWriteTool(project_root="./", persistence_dir="memory/todos")
     
     # 1. 创建任务列表
-    print("\n1️⃣ 创建任务列表")
+    print("\n1 创建任务列表")
     response = tool.run({
         "summary": "实现电商核心功能",
         "todos": [
@@ -36,11 +36,11 @@ def demo_1_basic_usage():
             {"content": "实现库存管理", "status": "pending"}
         ]
     })
-    print(f"✅ {response.text}")
-    print(f"📊 统计: {response.data['stats']}")
+    print(f" {response.text}")
+    print(f" 统计: {response.data['stats']}")
     
     # 2. 开始第一个任务
-    print("\n2️⃣ 开始第一个任务")
+    print("\n2 开始第一个任务")
     response = tool.run({
         "summary": "实现电商核心功能",
         "todos": [
@@ -50,10 +50,10 @@ def demo_1_basic_usage():
             {"content": "实现库存管理", "status": "pending"}
         ]
     })
-    print(f"✅ {response.text}")
+    print(f" {response.text}")
     
     # 3. 完成第一个任务，开始第二个
-    print("\n3️⃣ 完成第一个任务，开始第二个")
+    print("\n3 完成第一个任务，开始第二个")
     response = tool.run({
         "summary": "实现电商核心功能",
         "todos": [
@@ -63,10 +63,10 @@ def demo_1_basic_usage():
             {"content": "实现库存管理", "status": "pending"}
         ]
     })
-    print(f"✅ {response.text}")
+    print(f" {response.text}")
     
     # 4. 继续完成任务
-    print("\n4️⃣ 继续完成任务")
+    print("\n4 继续完成任务")
     response = tool.run({
         "summary": "实现电商核心功能",
         "todos": [
@@ -76,10 +76,10 @@ def demo_1_basic_usage():
             {"content": "实现库存管理", "status": "pending"}
         ]
     })
-    print(f"✅ {response.text}")
+    print(f" {response.text}")
     
     # 5. 全部完成
-    print("\n5️⃣ 全部完成")
+    print("\n5 全部完成")
     response = tool.run({
         "summary": "实现电商核心功能",
         "todos": [
@@ -89,7 +89,7 @@ def demo_1_basic_usage():
             {"content": "实现库存管理", "status": "completed"}
         ]
     })
-    print(f"✅ {response.text}")
+    print(f" {response.text}")
 
 
 def demo_2_constraint_validation():
@@ -101,7 +101,7 @@ def demo_2_constraint_validation():
     tool = TodoWriteTool(project_root="./", persistence_dir="memory/todos")
     
     # 尝试创建多个 in_progress 任务（违反约束）
-    print("\n❌ 尝试创建多个 in_progress 任务")
+    print("\n 尝试创建多个 in_progress 任务")
     response = tool.run({
         "todos": [
             {"content": "任务1", "status": "in_progress"},
@@ -110,18 +110,18 @@ def demo_2_constraint_validation():
     })
     
     if response.status.value == "error":
-        print(f"🚫 错误: {response.error_info['message']}")
-        print(f"📝 错误码: {response.error_info['code']}")
+        print(f" 错误: {response.error_info['message']}")
+        print(f" 错误码: {response.error_info['code']}")
     
     # 正确的方式：最多 1 个 in_progress
-    print("\n✅ 正确方式：最多 1 个 in_progress")
+    print("\n 正确方式：最多 1 个 in_progress")
     response = tool.run({
         "todos": [
             {"content": "任务1", "status": "in_progress"},
             {"content": "任务2", "status": "pending"},
         ]
     })
-    print(f"✅ {response.text}")
+    print(f" {response.text}")
 
 
 def demo_3_agent_integration():
@@ -151,11 +151,11 @@ def demo_3_agent_integration():
     # 验证工具已注册
     tool = registry.get_tool("TodoWrite")
     if tool:
-        print("✅ TodoWriteTool 已自动注册")
-        print(f"📝 工具名称: {tool.name}")
-        print(f"📝 工具描述: {tool.description[:100]}...")
+        print(" TodoWriteTool 已自动注册")
+        print(f" 工具名称: {tool.name}")
+        print(f" 工具描述: {tool.description[:100]}...")
     else:
-        print("❌ TodoWriteTool 未注册")
+        print(" TodoWriteTool 未注册")
 
 
 def demo_4_persistence():
@@ -167,7 +167,7 @@ def demo_4_persistence():
     tool = TodoWriteTool(project_root="./", persistence_dir="memory/todos")
     
     # 创建任务列表（会自动持久化）
-    print("\n1️⃣ 创建任务列表（自动持久化）")
+    print("\n1 创建任务列表（自动持久化）")
     response = tool.run({
         "summary": "重构项目架构",
         "todos": [
@@ -176,7 +176,7 @@ def demo_4_persistence():
             {"content": "实施重构", "status": "pending"}
         ]
     })
-    print(f"✅ {response.text}")
+    print(f" {response.text}")
     
     # 查看持久化文件
     import os
@@ -187,16 +187,16 @@ def demo_4_persistence():
         files = sorted(todos_dir.glob("todoList-*.json"))
         if files:
             latest_file = files[-1]
-            print(f"\n📁 最新持久化文件: {latest_file.name}")
+            print(f"\n 最新持久化文件: {latest_file.name}")
             
             # 加载任务列表
-            print(f"\n2️⃣ 加载任务列表")
+            print(f"\n2 加载任务列表")
             tool2 = TodoWriteTool(project_root="./", persistence_dir="memory/todos")
             tool2.load_todos(str(latest_file))
             
-            print(f"✅ 已加载任务列表")
-            print(f"📝 摘要: {tool2.current_todos.summary}")
-            print(f"📊 统计: {tool2.current_todos.get_stats()}")
+            print(f" 已加载任务列表")
+            print(f" 摘要: {tool2.current_todos.summary}")
+            print(f" 统计: {tool2.current_todos.get_stats()}")
 
 
 def demo_5_recap_formats():
@@ -208,12 +208,12 @@ def demo_5_recap_formats():
     tool = TodoWriteTool(project_root="./", persistence_dir="memory/todos")
     
     # 场景 1：无任务
-    print("\n📋 场景 1：无任务")
+    print("\n 场景 1：无任务")
     response = tool.run({"action": "clear"})
     print(f"   {response.text}")
     
     # 场景 2：部分完成
-    print("\n📋 场景 2：部分完成")
+    print("\n 场景 2：部分完成")
     response = tool.run({
         "todos": [
             {"content": "任务1", "status": "completed"},
@@ -224,7 +224,7 @@ def demo_5_recap_formats():
     print(f"   {response.text}")
     
     # 场景 3：全部完成
-    print("\n📋 场景 3：全部完成")
+    print("\n 场景 3：全部完成")
     response = tool.run({
         "todos": [
             {"content": "任务1", "status": "completed"},
@@ -234,7 +234,7 @@ def demo_5_recap_formats():
     print(f"   {response.text}")
     
     # 场景 4：多个待处理（截断）
-    print("\n📋 场景 4：多个待处理（截断）")
+    print("\n 场景 4：多个待处理（截断）")
     todos = [{"content": f"任务{i}", "status": "pending"} for i in range(1, 11)]
     todos[0]["status"] = "in_progress"
     response = tool.run({"todos": todos})
@@ -242,7 +242,7 @@ def demo_5_recap_formats():
 
 
 if __name__ == "__main__":
-    print("\n🚀 TodoWrite 进度管理工具示例")
+    print("\n TodoWrite 进度管理工具示例")
     print("="*60)
     
     # 运行所有示例
@@ -253,6 +253,6 @@ if __name__ == "__main__":
     demo_5_recap_formats()
     
     print("\n" + "="*60)
-    print("✅ 所有示例运行完成")
+    print(" 所有示例运行完成")
     print("="*60)
 

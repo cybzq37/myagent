@@ -66,7 +66,7 @@ async def test_parallel_performance():
     )
     
     # 测试异步并行执行
-    print("\n🚀 测试异步并行执行（3个工具同时运行）")
+    print("\n 测试异步并行执行（3个工具同时运行）")
     start_time = time.time()
     
     # 假设 Agent 会调用这 3 个工具
@@ -75,7 +75,7 @@ async def test_parallel_performance():
     
     elapsed = time.time() - start_time
     
-    print(f"\n⏱️  异步并行执行耗时: {elapsed:.2f}s")
+    print(f"\n  异步并行执行耗时: {elapsed:.2f}s")
     print(f"   理论最优: ~1.0s（3个工具并行）")
     print(f"   同步执行: ~3.0s（3个工具串行）")
     print(f"   性能提升: {3.0 / elapsed:.2f}x")
@@ -109,14 +109,14 @@ async def test_concurrency_limit():
         config=config
     )
     
-    print("\n🚀 测试并发限制（5个工具，最多2个并行）")
+    print("\n 测试并发限制（5个工具，最多2个并行）")
     start_time = time.time()
     
     result = await agent.arun("请调用所有 5 个工具")
     
     elapsed = time.time() - start_time
     
-    print(f"\n⏱️  执行耗时: {elapsed:.2f}s")
+    print(f"\n  执行耗时: {elapsed:.2f}s")
     print(f"   理论耗时: ~3.0s（5个工具，每次2个并行：2+2+1）")
     print(f"   无限制: ~1.0s（5个工具全部并行）")
     print(f"   串行执行: ~5.0s（5个工具串行）")

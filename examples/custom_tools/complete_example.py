@@ -132,30 +132,30 @@ def main():
     print()
     
     # 1. 创建工具注册表
-    print("📦 步骤 1: 创建工具注册表")
+    print(" 步骤 1: 创建工具注册表")
     registry = ToolRegistry()
-    print("✅ 工具注册表创建成功")
+    print(" 工具注册表创建成功")
     print()
     
     # 2. 注册简单工具
-    print("📦 步骤 2: 注册简单工具")
+    print(" 步骤 2: 注册简单工具")
     greeting_tool = GreetingTool()
     registry.register_tool(greeting_tool)
     print()
     
     # 3. 注册函数式工具
-    print("📦 步骤 3: 注册函数式工具")
+    print(" 步骤 3: 注册函数式工具")
     registry.register_function(word_counter)
     print()
     
     # 4. 注册可展开工具
-    print("📦 步骤 4: 注册可展开工具")
+    print(" 步骤 4: 注册可展开工具")
     text_processor = TextProcessorTool()
     registry.register_tool(text_processor)
     print()
     
     # 5. 查看所有已注册的工具
-    print("📋 步骤 5: 查看所有已注册的工具")
+    print(" 步骤 5: 查看所有已注册的工具")
     tools = registry.list_tools()
     print(f"已注册 {len(tools)} 个工具:")
     for tool_name in tools:
@@ -164,7 +164,7 @@ def main():
     
     # 6. 直接测试工具
     print("=" * 60)
-    print("🧪 直接测试工具")
+    print(" 直接测试工具")
     print("=" * 60)
     print()
     
@@ -197,7 +197,7 @@ def main():
     
     # 7. 在 Agent 中使用（可选，需要配置 LLM）
     print("=" * 60)
-    print("🤖 在 Agent 中使用工具")
+    print(" 在 Agent 中使用工具")
     print("=" * 60)
     print()
     print("提示: 要在 Agent 中使用工具，需要配置 LLM。")
@@ -213,10 +213,10 @@ def main():
     print()
     
     print("=" * 60)
-    print("✅ 示例完成！")
+    print(" 示例完成！")
     print("=" * 60)
     print()
-    print("📚 更多信息:")
+    print(" 更多信息:")
     print("  - 文档: docs/custom_tools_guide.md")
     print("  - 模板: examples/custom_tools/*_template.py")
     print("  - 示例: examples/custom_tools/weather_tool.py")
