@@ -10,7 +10,7 @@ from datetime import datetime
 from myagent.core.session_store import SessionStore
 from myagent.core.message import Message
 from myagent.core.agent import Agent
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.agents.simple_agent import SimpleAgent
 # 加载环境变量
@@ -170,7 +170,7 @@ class TestAgentSessionPersistence:
     def test_agent_save_session(self):
         """测试 Agent 保存会话"""
         # 创建 Agent
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent(
             name="test_agent",
             llm=llm,
@@ -197,7 +197,7 @@ class TestAgentSessionPersistence:
     def test_agent_load_session(self):
         """测试 Agent 加载会话"""
         # 创建并保存会话
-        llm = MyAgent()
+        llm = AgentLLM()
         agent1 = SimpleAgent(
             name="agent1",
             llm=llm,
@@ -225,7 +225,7 @@ class TestAgentSessionPersistence:
 
     def test_agent_list_sessions(self):
         """测试 Agent 列出会话"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent(
             name="test_agent",
             llm=llm,
@@ -246,7 +246,7 @@ class TestAgentSessionPersistence:
     def test_session_disabled(self):
         """测试禁用会话持久化"""
         config = Config(session_enabled=False)
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent(
             name="test_agent",
             llm=llm,
@@ -267,7 +267,7 @@ class TestAgentSessionPersistence:
             trace_enabled=False
         )
 
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent(
             name="test_agent",
             llm=llm,
@@ -287,7 +287,7 @@ class TestAgentSessionPersistence:
         from myagent.tools.registry import ToolRegistry
         from myagent.tools.builtin.calculator import CalculatorTool
 
-        llm = MyAgent()
+        llm = AgentLLM()
         registry = ToolRegistry()
         registry.register_tool(CalculatorTool())
 
@@ -309,7 +309,7 @@ class TestAgentSessionPersistence:
 
     def test_session_metadata_tracking(self):
         """测试会话元数据追踪"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent(
             name="test_agent",
             llm=llm,

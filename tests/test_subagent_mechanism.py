@@ -2,7 +2,7 @@
 
 import pytest
 from myagent.core.agent import Agent
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.core.message import Message
 from myagent.tools.registry import ToolRegistry
@@ -60,7 +60,7 @@ class MockBashTool(Tool):
 class MockSimpleAgent(Agent):
     """简单的 Mock Agent，用于测试"""
     
-    def __init__(self, name: str, llm: MyAgent, config: Config = None, tool_registry: ToolRegistry = None):
+    def __init__(self, name: str, llm: AgentLLM, config: Config = None, tool_registry: ToolRegistry = None):
         super().__init__(name, llm, config=config, tool_registry=tool_registry)
         self.run_count = 0
     
@@ -94,7 +94,7 @@ class TestAgentRunAsSubagent:
     
     def test_basic_subagent_execution(self):
         """测试基本的子代理执行"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         config = Config(subagent_enabled=False)  # 禁用自动注册
         agent = MockSimpleAgent("test", llm, config=config)
         
@@ -115,7 +115,7 @@ class TestAgentRunAsSubagent:
     
     def test_context_isolation(self):
         """测试上下文隔离"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         config = Config(subagent_enabled=False)
         agent = MockSimpleAgent("test", llm, config=config)
         
@@ -136,7 +136,7 @@ class TestAgentRunAsSubagent:
     
     def test_tool_filter_readonly(self):
         """测试只读工具过滤"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         # 禁用 skills 和 subagent 自动注册
         config = Config(subagent_enabled=False, skills_enabled=False)
 
@@ -168,7 +168,7 @@ class TestAgentRunAsSubagent:
     
     def test_tool_filter_full_access(self):
         """测试完全访问过滤器"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         # 禁用 skills 和 subagent 自动注册
         config = Config(subagent_enabled=False, skills_enabled=False)
 
@@ -198,7 +198,7 @@ class TestAgentRunAsSubagent:
     
     def test_return_full_result(self):
         """测试返回完整结果（而非摘要）"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         config = Config(subagent_enabled=False)
         agent = MockSimpleAgent("test", llm, config=config)
         
@@ -214,7 +214,7 @@ class TestAgentRunAsSubagent:
     
     def test_max_steps_override(self):
         """测试覆盖最大步数"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         config = Config(subagent_enabled=False)
         agent = MockSimpleAgent("test", llm, config=config)
         
@@ -232,7 +232,7 @@ class TestAgentRunAsSubagent:
     
     def test_metadata_collection(self):
         """测试元数据收集"""
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
         config = Config(subagent_enabled=False)
         agent = MockSimpleAgent("test", llm, config=config)
         

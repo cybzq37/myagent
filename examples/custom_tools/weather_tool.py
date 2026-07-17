@@ -196,7 +196,7 @@ class WeatherTool(Tool):
 # ============================================
 
 if __name__ == "__main__":
-    from myagent import ToolRegistry, ReActAgent, MyAgent
+    from myagent import ToolRegistry, ReActAgent, AgentLLM
     
     # 1. 创建工具
     print("=== 创建天气工具 ===")
@@ -234,7 +234,7 @@ if __name__ == "__main__":
     registry = ToolRegistry()
     registry.register_tool(tool)
     
-    llm = MyAgent()
+    llm = AgentLLM()
     agent = ReActAgent("assistant", llm, tool_registry=registry)
     
     result = agent.run("查询上海的天气")

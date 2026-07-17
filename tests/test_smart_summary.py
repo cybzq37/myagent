@@ -2,7 +2,7 @@
 
 import pytest
 import os
-from myagent import SimpleAgent, MyAgent
+from myagent import SimpleAgent, AgentLLM
 from myagent.core.message import Message
 from myagent.core.config import Config
 
@@ -14,7 +14,7 @@ load_dotenv()
 @pytest.fixture
 def llm():
     """创建真实的 LLM"""
-    return MyAgent()
+    return AgentLLM()
 
 
 @pytest.fixture

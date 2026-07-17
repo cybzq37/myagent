@@ -4,7 +4,7 @@
 """
 
 import asyncio
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.core.lifecycle import AgentEvent, EventType
 from myagent.agents.react_agent import ReActAgent
@@ -113,7 +113,7 @@ async def main():
     print("=" * 60)
     
     # 1. 初始化 LLM
-    llm = MyAgent()
+    llm = AgentLLM()
     
     # 2. 创建工具注册表
     registry = ToolRegistry()
@@ -165,7 +165,7 @@ async def stream_example():
     print("=" * 60)
     
     # 初始化（同上）
-    llm = MyAgent(...)
+    llm = AgentLLM(...)
     agent = ReActAgent(...)
     
     # 流式执行

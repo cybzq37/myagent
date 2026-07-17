@@ -10,7 +10,7 @@ from datetime import datetime
 from myagent.tools.builtin.todowrite_tool import TodoWriteTool, TodoItem, TodoList
 from myagent.tools.response import ToolResponse, ToolStatus
 from myagent.tools.errors import ToolErrorCode
-from myagent import ToolRegistry, ReActAgent, MyAgent, Config
+from myagent import ToolRegistry, ReActAgent, AgentLLM, Config
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -333,7 +333,7 @@ class TestAgentIntegration:
         )
 
         registry = ToolRegistry()
-        llm = MyAgent()
+        llm = AgentLLM()
 
         # 创建 Agent（应该自动注册 TodoWriteTool）
         agent = ReActAgent(
@@ -353,7 +353,7 @@ class TestAgentIntegration:
         config = Config(todowrite_enabled=False)
 
         registry = ToolRegistry()
-        llm = MyAgent()
+        llm = AgentLLM()
 
         agent = ReActAgent(
             name="test_agent",

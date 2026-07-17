@@ -135,7 +135,7 @@ class SimpleToolTemplate(Tool):
 # ============================================
 
 if __name__ == "__main__":
-    from myagent import ToolRegistry, ReActAgent, MyAgent
+    from myagent import ToolRegistry, ReActAgent, AgentLLM
     
     # 1. 创建工具实例
     tool = SimpleToolTemplate()
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     registry.register_tool(tool)
     
     # 4. 在 Agent 中使用
-    llm = MyAgent()
+    llm = AgentLLM()
     agent = ReActAgent("assistant", llm, tool_registry=registry)
     
     # Agent 会自动调用工具

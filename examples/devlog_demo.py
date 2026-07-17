@@ -8,7 +8,7 @@
 """
 
 from myagent import ReActAgent, ToolRegistry
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.tools.builtin import DevLogTool
 from pathlib import Path
@@ -158,7 +158,7 @@ def demo_3_agent_integration():
 
     # 创建 Agent（DevLogTool 会自动注册）
     registry = ToolRegistry()
-    llm = MyAgent()
+    llm = AgentLLM()
     agent = ReActAgent(
         name="开发助手",
         llm=llm,

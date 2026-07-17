@@ -23,7 +23,7 @@ from myagent.tools.builtin.devlog_tool import (
 from myagent.tools.response import ToolResponse, ToolStatus
 from myagent.tools.errors import ToolErrorCode
 from myagent import ReActAgent, ToolRegistry
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from dotenv import load_dotenv
 load_dotenv()
@@ -376,7 +376,7 @@ class TestAgentIntegration:
             )
 
             registry = ToolRegistry()
-            llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+            llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
 
             agent = ReActAgent(
                 name="TestAgent",
@@ -404,7 +404,7 @@ class TestAgentIntegration:
         )
 
         registry = ToolRegistry()
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
 
         agent = ReActAgent(
             name="TestAgent",

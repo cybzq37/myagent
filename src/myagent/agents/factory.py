@@ -5,7 +5,7 @@
 
 from typing import Optional, TYPE_CHECKING
 from ..core.agent import Agent
-from ..core.llm import MyAgent
+from ..core.llm import AgentLLM
 from ..core.config import Config
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 def create_agent(
     agent_type: str,
     name: str,
-    llm: MyAgent,
+    llm: AgentLLM,
     tool_registry: Optional['ToolRegistry'] = None,
     config: Optional[Config] = None,
     system_prompt: Optional[str] = None
@@ -90,7 +90,7 @@ def create_agent(
 
 def default_subagent_factory(
     agent_type: str,
-    llm: MyAgent,
+    llm: AgentLLM,
     tool_registry: Optional['ToolRegistry'] = None,
     config: Optional[Config] = None
 ) -> Agent:

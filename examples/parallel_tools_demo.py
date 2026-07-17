@@ -5,7 +5,7 @@
 
 import asyncio
 import time
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.agents.react_agent import ReActAgent
 from myagent.tools.registry import ToolRegistry
@@ -57,7 +57,7 @@ async def test_parallel_performance():
     )
     
     # 创建 Agent
-    llm = MyAgent(...)  # 需要配置真实 LLM
+    llm = AgentLLM(...)  # 需要配置真实 LLM
     agent = ReActAgent(
         name="ParallelAgent",
         llm=llm,
@@ -101,7 +101,7 @@ async def test_concurrency_limit():
         trace_enabled=False
     )
     
-    llm = MyAgent(...)
+    llm = AgentLLM(...)
     agent = ReActAgent(
         name="LimitedAgent",
         llm=llm,

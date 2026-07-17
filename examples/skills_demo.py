@@ -9,7 +9,7 @@
 
 from myagent.skills import SkillLoader, Skill
 from myagent import ReActAgent, SimpleAgent
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.tools.registry import ToolRegistry
 from myagent.tools.builtin.skill_tool import SkillTool
@@ -145,7 +145,7 @@ def demo_zero_config_activation():
             trace_enabled=False
         )
         
-        llm = MyAgent()
+        llm = AgentLLM()
         registry = ToolRegistry()
         agent = ReActAgent("assistant", llm, tool_registry=registry, config=config)
         

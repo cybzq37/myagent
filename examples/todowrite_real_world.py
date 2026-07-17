@@ -9,7 +9,7 @@
 - 搜索功能
 """
 
-from myagent import ReActAgent, MyAgent, ToolRegistry, Config
+from myagent import ReActAgent, AgentLLM, ToolRegistry, Config
 from myagent.tools.builtin import TodoWriteTool
 from dotenv import load_dotenv
 import time

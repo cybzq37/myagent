@@ -1,10 +1,10 @@
 import os
 from typing import Optional
 from openai import OpenAI
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 
 
-class MyLLM(MyAgent):
+class MyLLM(AgentLLM):
     def __init__(
         self,
         model: Optional[str] = None,

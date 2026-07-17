@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, List, Dict, Any, Union, TYPE_CHECKING, AsyncGenerator
 import asyncio
 from .message import Message
-from .llm import MyAgent
+from .llm import AgentLLM
 from .config import Config
 from .lifecycle import AgentEvent, EventType, LifecycleHook, ExecutionContext
 
@@ -38,7 +38,7 @@ class Agent(ABC):
     def __init__(
         self,
         name: str,
-        llm: MyAgent,
+        llm: AgentLLM,
         system_prompt: Optional[str] = None,
         config: Optional[Config] = None,
         tool_registry: Optional['ToolRegistry'] = None
@@ -496,13 +496,13 @@ class Agent(ABC):
             MyAgent 实例
         """
         if not hasattr(self, '_summary_llm'):
-            from ..core.llm import MyAgent
+            from ..core.llm import AgentLLM
 
             # 使用配置中的轻量模型
             provider = self.config.summary_llm_provider
             model = self.config.summary_llm_model
 
-            self._summary_llm = MyAgent(
+            self._summary_llm = AgentLLM(
                 provider=provider,
                 model=model,
                 temperature=self.config.summary_temperature,
@@ -1166,8 +1166,8 @@ class Agent(ABC):
             # 决定使用哪个 LLM
             if self.config.subagent_use_light_llm:
                 # 使用轻量模型
-                from ..core.llm import MyAgent
-                light_llm = MyAgent(
+                from ..core.llm import AgentLLM
+                light_llm = AgentLLM(
                     provider=self.config.subagent_light_llm_provider,
                     model=self.config.subagent_light_llm_model
                 )
@@ -1272,14 +1272,14 @@ class Agent(ABC):
         random_suffix = uuid.uuid4().hex[:4]
         return f"s-{timestamp}-{random_suffix}"
 
-    def _create_light_llm(self) -> MyAgent:
+    def _create_light_llm(self) -> AgentLLM:
         """创建轻量模型 LLM 实例
 
         Returns:
             轻量模型 LLM 实例
         """
         # 复用主 LLM 的配置，但使用轻量模型
-        light_llm = MyAgent(
+        light_llm = AgentLLM(
             provider=self.config.subagent_light_llm_provider,
             model=self.config.subagent_light_llm_model,
             temperature=self.llm.temperature if hasattr(self.llm, 'temperature') else 0.7,

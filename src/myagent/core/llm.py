@@ -291,6 +291,3 @@ class AgentLLM:
             lambda: self.invoke_with_tools(messages, tools, tool_choice, **kwargs)
         )
 
-
-# 向后兼容旧类名，避免现有导入点失效。
-MyAgent = AgentLLM

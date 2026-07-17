@@ -7,7 +7,7 @@ from myagent import (
     ReActAgent, 
     ReflectionAgent, 
     PlanAndSolveAgent,
-    MyAgent, 
+    AgentLLM, 
     ToolRegistry
 )
 from myagent.tools.builtin.calculator import CalculatorTool
@@ -29,7 +29,7 @@ class TestEnvironment:
     def test_llm_initialization(self):
         """验证LLM可以正常初始化"""
         try:
-            llm = MyAgent()
+            llm = AgentLLM()
             assert llm is not None
             print(f"\n LLM初始化成功")
         except Exception as e:
@@ -41,7 +41,7 @@ class TestSimpleAgentUsage:
     
     def test_basic_conversation(self):
         """场景1: 基础对话"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent(
             name="AI助手",
             llm=llm,
@@ -57,7 +57,7 @@ class TestSimpleAgentUsage:
     
     def test_with_calculator(self):
         """场景2: 使用计算器工具"""
-        llm = MyAgent()
+        llm = AgentLLM()
         registry = ToolRegistry()
         registry.register_tool(CalculatorTool())
 
@@ -77,7 +77,7 @@ class TestSimpleAgentUsage:
     
     def test_multi_turn(self):
         """场景3: 多轮对话"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent("记忆助手", llm)
         
         # 第一轮
@@ -95,7 +95,7 @@ class TestReActAgentUsage:
     
     def test_basic_reasoning(self):
         """场景1: 基础推理"""
-        llm = MyAgent()
+        llm = AgentLLM()
         registry = ToolRegistry()
         
         agent = ReActAgent(
@@ -114,7 +114,7 @@ class TestReActAgentUsage:
     
     def test_tool_reasoning(self):
         """场景2: 工具推理"""
-        llm = MyAgent()
+        llm = AgentLLM()
         registry = ToolRegistry()
         registry.register_tool(CalculatorTool())
         
@@ -137,7 +137,7 @@ class TestReflectionAgentUsage:
     
     def test_basic_reflection(self):
         """场景1: 基础反思"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = ReflectionAgent(
             name="反思助手",
             llm=llm,
@@ -153,7 +153,7 @@ class TestReflectionAgentUsage:
 
     def test_code_generation(self):
         """场景2: 代码生成与反思"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = ReflectionAgent(
             name="代码助手",
             llm=llm,
@@ -172,7 +172,7 @@ class TestPlanAndSolveAgentUsage:
 
     def test_basic_planning(self):
         """场景1: 基础规划"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = PlanAndSolveAgent(
             name="规划助手",
             llm=llm
@@ -187,7 +187,7 @@ class TestPlanAndSolveAgentUsage:
 
     def test_math_planning(self):
         """场景2: 数学问题规划"""
-        llm = MyAgent()
+        llm = AgentLLM()
         registry = ToolRegistry()
         registry.register_tool(CalculatorTool())
 
@@ -210,7 +210,7 @@ class TestAgentComparison:
 
     def test_same_task_different_agents(self):
         """场景: 同一任务使用不同Agent"""
-        llm = MyAgent()
+        llm = AgentLLM()
         task = "解释什么是递归"
 
         # SimpleAgent
@@ -237,7 +237,7 @@ class TestErrorHandling:
 
     def test_empty_input(self):
         """场景: 空输入处理"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent("测试助手", llm)
 
         try:
@@ -250,7 +250,7 @@ class TestErrorHandling:
 
     def test_agent_without_tools(self):
         """场景: Agent无工具时的表现"""
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = ReActAgent("无工具助手", llm, tool_registry=ToolRegistry())
 
         result = agent.run("你好")
@@ -261,5 +261,4 @@ class TestErrorHandling:
 if __name__ == "__main__":
     # 运行所有测试
     pytest.main([__file__, "-v", "-s", "--tb=short"])
-
 

@@ -4,7 +4,7 @@ from typing import Optional, Iterator, TYPE_CHECKING, List, Dict, Any, AsyncGene
 import json
 
 from ..core.agent import Agent
-from ..core.llm import MyAgent
+from ..core.llm import AgentLLM
 from ..core.config import Config
 from ..core.message import Message
 from ..core.streaming import StreamEvent, StreamEventType
@@ -25,7 +25,7 @@ class SimpleAgent(Agent):
     def __init__(
         self,
         name: str,
-        llm: MyAgent,
+        llm: AgentLLM,
         system_prompt: Optional[str] = None,
         config: Optional[Config] = None,
         tool_registry: Optional['ToolRegistry'] = None,

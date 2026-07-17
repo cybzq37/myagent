@@ -213,7 +213,7 @@ class TestAgentIntegration:
     def test_agent_skill_loader_initialization(self):
         """测试 Agent 初始化时创建 SkillLoader"""
         from myagent.core.agent import Agent
-        from myagent.core.llm import MyAgent
+        from myagent.core.llm import AgentLLM
         from myagent.core.config import Config
         from myagent.tools.registry import ToolRegistry
 
@@ -221,7 +221,7 @@ class TestAgentIntegration:
         temp_dir = tempfile.mkdtemp()
         try:
             config = Config(skills_enabled=True, skills_dir=temp_dir)
-            llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+            llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
             registry = ToolRegistry()
 
             # 创建一个简单的 Agent 子类用于测试
@@ -249,11 +249,11 @@ class TestAgentIntegration:
     def test_agent_skill_disabled(self):
         """测试禁用 Skills 功能"""
         from myagent.core.agent import Agent
-        from myagent.core.llm import MyAgent
+        from myagent.core.llm import AgentLLM
         from myagent.core.config import Config
 
         config = Config(skills_enabled=False)
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = AgentLLM(provider="openai", model="gpt-3.5-turbo")
 
         class TestAgent(Agent):
             def run(self, input_text: str, **kwargs) -> str:

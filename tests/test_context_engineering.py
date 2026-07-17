@@ -300,9 +300,9 @@ class TestAgentIntegration:
 
     def test_agent_history_manager_integration(self):
         """测试 Agent 集成 HistoryManager"""
-        from myagent import SimpleAgent, MyAgent
+        from myagent import SimpleAgent, AgentLLM
 
-        llm = MyAgent()
+        llm = AgentLLM()
         config = Config(min_retain_rounds=2)
         agent = SimpleAgent("测试助手", llm, config=config)
 
@@ -321,9 +321,9 @@ class TestAgentIntegration:
 
     def test_agent_auto_compression(self):
         """测试 Agent 自动压缩"""
-        from myagent import SimpleAgent, MyAgent
+        from myagent import SimpleAgent, AgentLLM
 
-        llm = MyAgent()
+        llm = AgentLLM()
         config = Config(min_retain_rounds=2)
         agent = SimpleAgent("测试助手", llm, config=config)
 
@@ -343,9 +343,9 @@ class TestAgentIntegration:
 
     def test_agent_truncator_integration(self):
         """测试 Agent 集成 ObservationTruncator"""
-        from myagent import SimpleAgent, MyAgent
+        from myagent import SimpleAgent, AgentLLM
 
-        llm = MyAgent()
+        llm = AgentLLM()
         agent = SimpleAgent("测试助手", llm)
 
         # 验证 ObservationTruncator 已初始化
@@ -356,9 +356,9 @@ class TestAgentIntegration:
 
     def test_agent_real_conversation_with_compression(self):
         """测试真实对话场景下的自动压缩（真实 API 调用）"""
-        from myagent import SimpleAgent, MyAgent
+        from myagent import SimpleAgent, AgentLLM
 
-        llm = MyAgent()
+        llm = AgentLLM()
         config = Config(
             min_retain_rounds=3,  # 保留最近 3 轮
             enable_smart_compression=False  # 使用简单摘要

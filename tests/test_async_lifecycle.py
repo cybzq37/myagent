@@ -5,7 +5,7 @@ import asyncio
 import time
 from myagent.core.lifecycle import AgentEvent, EventType, ExecutionContext
 from myagent.core.agent import Agent
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.agents.react_agent import ReActAgent
 from myagent.tools.base import Tool, ToolParameter

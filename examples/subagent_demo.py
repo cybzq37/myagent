@@ -4,7 +4,7 @@
 """
 
 from myagent import ReActAgent, SimpleAgent
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.tools.registry import ToolRegistry
 from myagent.tools.builtin import ReadTool, WriteTool, EditTool
@@ -20,7 +20,7 @@ def example_1_basic_subagent():
     print("="*60)
 
     # 创建 LLM（使用环境变量配置的模型）
-    llm = MyAgent()
+    llm = AgentLLM()
 
     # 创建工具注册表
     registry = ToolRegistry()
@@ -48,7 +48,7 @@ def example_2_manual_subagent():
     print("="*60)
 
     # 使用环境变量配置的模型
-    llm = MyAgent()
+    llm = AgentLLM()
 
     # 禁用自动注册，避免重复
     config = Config(subagent_enabled=False, skills_enabled=False)
@@ -90,10 +90,10 @@ def example_3_custom_factory():
     print("="*60)
 
     # 主模型（使用环境变量配置）
-    main_llm = MyAgent()
+    main_llm = AgentLLM()
 
     # 轻量模型（使用环境变量配置）
-    light_llm = MyAgent()
+    light_llm = AgentLLM()
 
     config = Config(subagent_enabled=False, skills_enabled=False)
 
@@ -140,7 +140,7 @@ def example_4_different_agent_types():
     print("示例 4：不同类型的子代理")
     print("="*60)
 
-    llm = MyAgent()
+    llm = AgentLLM()
     config = Config(subagent_enabled=False, skills_enabled=False)
     registry = ToolRegistry()
 
@@ -176,7 +176,7 @@ def example_5_tool_filtering():
         CustomFilter
     )
 
-    llm = MyAgent()
+    llm = AgentLLM()
     config = Config(subagent_enabled=False, skills_enabled=False)
 
     registry = ToolRegistry()

@@ -17,7 +17,7 @@ from typing import Optional
 import asyncio
 
 from myagent import ReActAgent, SimpleAgent, ReflectionAgent, PlanSolveAgent
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.config import Config
 from myagent.tools.registry import ToolRegistry
 from myagent.tools.base import Tool, ToolParameter
@@ -45,7 +45,7 @@ config = Config(
     base_url="https://api.deepseek.com",
     stream_enabled=True
 )
-llm = MyAgent(config=config)
+llm = AgentLLM(config=config)
 
 # 初始化工具注册表
 registry = ToolRegistry()

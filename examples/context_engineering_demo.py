@@ -12,7 +12,7 @@ from myagent.context.history import HistoryManager
 from myagent.context.truncator import ObservationTruncator
 from myagent.context.token_counter import TokenCounter
 from myagent.core.message import Message
-from myagent import SimpleAgent, MyAgent, Config
+from myagent import SimpleAgent, AgentLLM, Config
 from pathlib import Path
 import tempfile
 
@@ -71,7 +71,7 @@ def demo_simple_summary():
         context_window=8000
     )
 
-    llm = MyAgent()
+    llm = AgentLLM()
     agent = SimpleAgent("简单摘要助手", llm, config=config)
 
     # 添加多轮对话
@@ -108,7 +108,7 @@ def demo_smart_summary():
         context_window=8000
     )
 
-    llm = MyAgent()
+    llm = AgentLLM()
     agent = SimpleAgent("智能摘要助手", llm, config=config)
 
     # 添加多轮对话（更复杂的任务）

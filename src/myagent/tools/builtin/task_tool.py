@@ -6,7 +6,7 @@
 from typing import Dict, Any, List, Optional, Callable, TYPE_CHECKING
 from ..base import Tool, ToolParameter
 from ...core.agent import Agent
-from ...core.llm import MyAgent
+from ...core.llm import AgentLLM
 from ...core.config import Config
 from ..response import ToolResponse
 from ..errors import ToolErrorCode

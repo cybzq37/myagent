@@ -3,7 +3,7 @@
 这个文件展示了如何使用 MyAgent 框架创建和使用自定义工具的完整流程。
 """
 
-from myagent import ToolRegistry, ReActAgent, MyAgent, Config
+from myagent import ToolRegistry, ReActAgent, AgentLLM, Config
 from myagent.tools import Tool, ToolParameter, ToolResponse, tool_action
 from myagent.tools.errors import ToolErrorCode
 
@@ -203,7 +203,7 @@ def main():
     print("提示: 要在 Agent 中使用工具，需要配置 LLM。")
     print("示例代码:")
     print("""
-    llm = MyAgent()
+    llm = AgentLLM()
     agent = ReActAgent("assistant", llm, tool_registry=registry)
     
     # Agent 会自动调用合适的工具

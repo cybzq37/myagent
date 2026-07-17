@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from myagent.core.exceptions import MyAgentException
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.core.llm_adapters import AnthropicAdapter, GeminiAdapter, OpenAIAdapter
 
 
@@ -71,7 +71,7 @@ class TestLLMFunctionCalling:
             "LLM_BASE_URL": "https://api.test.com/v1",
             "LLM_MODEL_ID": "test-model",
         }):
-            return MyAgent()
+            return AgentLLM()
 
     def test_invoke_with_tools_basic(self, llm, mock_openai_client):
         """测试基本的 Function Calling 调用"""
@@ -319,7 +319,7 @@ class TestLLMFunctionCallingIntegration:
     @pytest.mark.skip(reason="需要真实 LLM 环境")
     def test_real_function_calling(self):
         """测试真实的 Function Calling"""
-        llm = MyAgent()
+        llm = AgentLLM()
         response = llm.invoke_with_tools(
             [{"role": "user", "content": "帮我计算 15 * 8"}],
             _tool_schema(),

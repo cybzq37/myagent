@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 
 from myagent.core.config import Config
-from myagent.core.llm import MyAgent
+from myagent.core.llm import AgentLLM
 from myagent.agents.react_agent import ReActAgent
 from myagent.tools.registry import ToolRegistry
 from myagent.tools.builtin.calculator import CalculatorTool
@@ -33,7 +33,7 @@ class TestTraceIntegration:
         )
         
         # 创建 LLM（使用 mock）
-        llm = MyAgent(
+        llm = AgentLLM(
             model="gpt-3.5-turbo",
             api_key="test-key",
             base_url="https://example.com/v1"
@@ -63,7 +63,7 @@ class TestTraceIntegration:
         """测试禁用 Trace"""
         config = Config(trace_enabled=False)
         
-        llm = MyAgent(
+        llm = AgentLLM(
             model="gpt-3.5-turbo",
             api_key="test-key",
             base_url="https://example.com/v1"
@@ -84,7 +84,7 @@ class TestTraceIntegration:
             trace_dir=self.temp_dir
         )
         
-        llm = MyAgent(
+        llm = AgentLLM(
             model="gpt-3.5-turbo",
             api_key="test-key",
             base_url="https://example.com/v1"
