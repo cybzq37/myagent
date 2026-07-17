@@ -33,7 +33,11 @@ class TestTraceIntegration:
         )
         
         # 创建 LLM（使用 mock）
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = MyAgent(
+            model="gpt-3.5-turbo",
+            api_key="test-key",
+            base_url="https://example.com/v1"
+        )
         
         # 创建工具注册表
         tool_registry = ToolRegistry()
@@ -59,7 +63,11 @@ class TestTraceIntegration:
         """测试禁用 Trace"""
         config = Config(trace_enabled=False)
         
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = MyAgent(
+            model="gpt-3.5-turbo",
+            api_key="test-key",
+            base_url="https://example.com/v1"
+        )
         agent = ReActAgent(
             name="TestAgent",
             llm=llm,
@@ -76,7 +84,11 @@ class TestTraceIntegration:
             trace_dir=self.temp_dir
         )
         
-        llm = MyAgent(provider="openai", model="gpt-3.5-turbo")
+        llm = MyAgent(
+            model="gpt-3.5-turbo",
+            api_key="test-key",
+            base_url="https://example.com/v1"
+        )
         agent = ReActAgent(
             name="TestAgent",
             llm=llm,
@@ -102,6 +114,20 @@ class TestTraceIntegration:
                 html_content = f.read()
                 assert "统计" in html_content
                 assert "Calculator" in html_content
+
+    def test_trace_config_loaded_from_env(self, monkeypatch):
+        """测试 trace 配置可从环境变量读取"""
+        monkeypatch.setenv("TRACE_ENABLED", "false")
+        monkeypatch.setenv("TRACE_DIR", self.temp_dir)
+        monkeypatch.setenv("TRACE_SANITIZE", "false")
+        monkeypatch.setenv("TRACE_HTML_INCLUDE_RAW_RESPONSE", "true")
+
+        config = Config()
+
+        assert config.trace_enabled is False
+        assert config.trace_dir == self.temp_dir
+        assert config.trace_sanitize is False
+        assert config.trace_html_include_raw_response is True
 
 
 if __name__ == "__main__":

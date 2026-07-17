@@ -2,7 +2,7 @@
 
 import os
 from typing import Optional, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 class Config(BaseModel):
     """MyAgent配置类
@@ -104,6 +104,73 @@ class Config(BaseModel):
     stream_include_thinking: bool = True  # 流式输出是否包含思考过程（o1 / deepseek-reasoner 的推理链）
     stream_include_tool_calls: bool = True  # 流式输出是否包含工具调用事件
 
+    @staticmethod
+    def _get_env_bool(name: str) -> Optional[bool]:
+        value = os.getenv(name)
+        if value is None:
+            return None
+        value = value.strip().lower()
+        if value in {"1", "true", "yes", "on"}:
+            return True
+        if value in {"0", "false", "no", "off"}:
+            return False
+        return None
+
+    @staticmethod
+    def _get_env_int(name: str) -> Optional[int]:
+        value = os.getenv(name)
+        if value is None or not value.strip():
+            return None
+        return int(value)
+
+    @staticmethod
+    def _get_env_float(name: str) -> Optional[float]:
+        value = os.getenv(name)
+        if value is None or not value.strip():
+            return None
+        return float(value)
+
+    @staticmethod
+    def _get_env_str(name: str) -> Optional[str]:
+        value = os.getenv(name)
+        if value is None or not value.strip():
+            return None
+        return value
+
+    @classmethod
+    def _env_defaults(cls) -> Dict[str, Any]:
+        defaults: Dict[str, Any] = {}
+
+        mappings = {
+            "debug": cls._get_env_bool("DEBUG"),
+            "log_level": cls._get_env_str("LOG_LEVEL"),
+            "temperature": cls._get_env_float("TEMPERATURE"),
+            "max_tokens": cls._get_env_int("MAX_TOKENS"),
+            "trace_enabled": cls._get_env_bool("TRACE_ENABLED"),
+            "trace_dir": cls._get_env_str("TRACE_DIR"),
+            "trace_sanitize": cls._get_env_bool("TRACE_SANITIZE"),
+            "trace_html_include_raw_response": cls._get_env_bool("TRACE_HTML_INCLUDE_RAW_RESPONSE"),
+        }
+
+        for key, value in mappings.items():
+            if value is not None:
+                defaults[key] = value
+
+        return defaults
+
+    @model_validator(mode="before")
+    @classmethod
+    def apply_env_defaults(cls, data: Any) -> Any:
+        """为未显式传入的字段填充环境变量默认值。"""
+        if data is None:
+            data = {}
+        if not isinstance(data, dict):
+            return data
+
+        merged = cls._env_defaults()
+        merged.update(data)
+        return merged
+
     @classmethod
     def from_env(cls) -> "Config":
         """从环境变量创建配置
@@ -113,13 +180,12 @@ class Config(BaseModel):
         - LOG_LEVEL: 日志级别
         - TEMPERATURE: 采样温度
         - MAX_TOKENS: 最大生成 Token 数
+        - TRACE_ENABLED: 是否启用 Trace
+        - TRACE_DIR: Trace 输出目录
+        - TRACE_SANITIZE: 是否脱敏
+        - TRACE_HTML_INCLUDE_RAW_RESPONSE: HTML 是否包含原始响应
         """
-        return cls(
-            debug=os.getenv("DEBUG", "false").lower() == "true",
-            log_level=os.getenv("LOG_LEVEL", "INFO"),
-            temperature=float(os.getenv("TEMPERATURE", "0.7")),
-            max_tokens=int(os.getenv("MAX_TOKENS")) if os.getenv("MAX_TOKENS") else None,
-        )
+        return cls()
 
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典（用于序列化和日志输出）"""
