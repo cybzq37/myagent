@@ -28,10 +28,13 @@ pyyaml = ">=6.0.0"
 # 可选依赖（按需启用）
 google-genai = {version = ">=1.0.0", optional = true}
 anthropic = {version = ">=0.20.0", optional = true}
+spacy = {version = ">=3.7.0,<4.0.0", optional = true}
 
 [tool.poetry.extras]
 gemini = ["google-genai"]
 anthropic = ["anthropic"]
+# memory 语义记忆模块：spaCy + 中文/英文模型（模型需手动 download，见 README）
+memory = ["spacy"]
 
 # ===== 开发依赖 =====
 [tool.poetry.group.dev.dependencies]
