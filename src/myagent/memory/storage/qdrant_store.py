@@ -509,8 +509,8 @@ class QdrantVectorStore:
             
             info = {
                 "name": self.collection_name,
-                "vectors_count": collection_info.vectors_count,
-                "indexed_vectors_count": collection_info.indexed_vectors_count,
+                "vectors_count": getattr(collection_info, "vectors_count", None) or collection_info.points_count,
+                "indexed_vectors_count": getattr(collection_info, "indexed_vectors_count", None),
                 "points_count": collection_info.points_count,
                 "segments_count": collection_info.segments_count,
                 "config": {
