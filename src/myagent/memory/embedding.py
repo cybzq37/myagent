@@ -14,6 +14,7 @@ from typing import List, Union, Optional
 import threading
 import os
 import numpy as np
+import requests
 
 
 # ==============
@@ -58,6 +59,24 @@ class OpenAICompatibleEmbedding(EmbeddingModel):
         self._dimension = len(test)
 
     def encode(self, texts: Union[str, List[str]]):
+        """调用 OpenAI 兼容 Embeddings API 把文本转向量。
+
+        请求：POST {base_url}/embeddings
+            Body: {"model": model_name, "input": ["text1", "text2", ...]}
+            Header: Authorization: Bearer {api_key}
+        响应：{"data": [{"embedding": [...]}, ...]}
+
+        参数:
+            texts: 单条字符串或字符串列表。单条传入时返回单个向量，
+                   列表传入时返回向量列表（与输入顺序一一对应）。
+
+        返回:
+            np.ndarray（单条）或 List[np.ndarray]（多条），维度由模型决定。
+
+        异常:
+            RuntimeError: HTTP 状态码 >= 400，或返回向量数量与输入不匹配。
+        """
+        # 1. 标准化输入：统一转成 list 处理，single 标记用于还原返回类型
         if isinstance(texts, str):
             inputs = [texts]
             single = True
@@ -65,8 +84,8 @@ class OpenAICompatibleEmbedding(EmbeddingModel):
             inputs = list(texts)
             single = False
 
-        import requests
-
+        # 2. 发送 OpenAI 兼容的 /embeddings 请求
+        #    vLLM / Ollama / DashScope 等都实现了这个接口
         url = self.base_url + "/embeddings"
         headers = {
             "Authorization": f"Bearer {self.api_key}" if self.api_key else "",
@@ -78,13 +97,19 @@ class OpenAICompatibleEmbedding(EmbeddingModel):
             raise RuntimeError(
                 f"Embedding REST 调用失败: {resp.status_code} {resp.text}"
             )
+
+        # 3. 解析响应：data 数组里每个 item 的 embedding 字段就是向量
         data = resp.json()
         items = data.get("data") or []
         vecs = [np.array(item.get("embedding")) for item in items]
+
+        # 4. 数量校验：服务端必须按顺序返回与输入等长的向量
         if len(vecs) != len(inputs):
             raise RuntimeError(
                 f"Embedding 返回数量不匹配: 期望 {len(inputs)}, 实际 {len(vecs)}"
             )
+
+        # 5. 还原返回类型：单条输入返回 ndarray，多条返回 List[ndarray]
         if single:
             return vecs[0]
         return vecs

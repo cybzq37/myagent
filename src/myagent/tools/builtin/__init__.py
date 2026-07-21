@@ -34,4 +34,5 @@ __all__ = [
     "CATEGORIES",
     "TaskTool",
     "SkillTool",
+    "MemoryTool",
 ]

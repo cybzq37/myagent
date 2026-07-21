@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 import math
+import os
 import numpy as np
 
 from ..base import BaseMemory, MemoryItem, MemoryConfig
@@ -129,48 +130,59 @@ class SemanticMemory(BaseMemory):
             try:
                 test_vec = self.embedding_model.encode("health_check")
                 dim = getattr(self.embedding_model, "dimension", len(test_vec))
-                logger.info(f"✅ 嵌入模型就绪，维度: {dim}")
+                logger.info(f"嵌入模型就绪，维度: {dim}")
             except Exception:
-                logger.info("✅ 嵌入模型就绪")
+                logger.info("嵌入模型就绪")
         except Exception as e:
-            logger.error(f"❌ 嵌入模型初始化失败: {e}")
+            logger.error(f"嵌入模型初始化失败: {e}")
             raise
     
     def _init_databases(self):
-        """初始化专业数据库存储"""
+        """初始化专业数据库存储
+
+        直接从环境变量读取配置（QDRANT_* / NEO4J_*），
+        不再依赖 core/database_config 模块。
+        """
         try:
-            from ...core.database_config import get_database_config
-            # 获取数据库配置
-            db_config = get_database_config()
-            
             # 初始化Qdrant向量数据库（使用连接管理器避免重复连接）
             from ..storage.qdrant_store import QdrantConnectionManager
-            qdrant_config = db_config.get_qdrant_config() or {}
-            qdrant_config["vector_size"] = get_dimension()
-            self.vector_store = QdrantConnectionManager.get_instance(**qdrant_config)
-            logger.info("✅ Qdrant向量数据库初始化完成")
-            
+            self.vector_store = QdrantConnectionManager.get_instance(
+                url=os.getenv("QDRANT_URL"),
+                api_key=os.getenv("QDRANT_API_KEY"),
+                collection_name=os.getenv("QDRANT_COLLECTION", "myagent_vectors"),
+                vector_size=get_dimension(),
+                distance=os.getenv("QDRANT_DISTANCE", "cosine"),
+                timeout=int(os.getenv("QDRANT_TIMEOUT", "30")),
+            )
+            logger.info("Qdrant向量数据库初始化完成")
+
             # 初始化Neo4j图数据库
             from ..storage.neo4j_store import Neo4jGraphStore
-            neo4j_config = db_config.get_neo4j_config()
-            self.graph_store = Neo4jGraphStore(**neo4j_config)
-            logger.info("✅ Neo4j图数据库初始化完成")
-            
+            self.graph_store = Neo4jGraphStore(
+                uri=os.getenv("NEO4J_URI", "bolt://localhost:7687"),
+                username=os.getenv("NEO4J_USERNAME", "neo4j"),
+                password=os.getenv("NEO4J_PASSWORD", "neo4j"),
+                database=os.getenv("NEO4J_DATABASE", "neo4j"),
+                max_connection_lifetime=int(os.getenv("NEO4J_MAX_CONNECTION_LIFETIME", "3600")),
+                max_connection_pool_size=int(os.getenv("NEO4J_MAX_CONNECTION_POOL_SIZE", "50")),
+                connection_acquisition_timeout=int(os.getenv("NEO4J_CONNECTION_TIMEOUT", "60")),
+            )
+            logger.info("Neo4j图数据库初始化完成")
+
             # 验证连接
             vector_health = self.vector_store.health_check()
             graph_health = self.graph_store.health_check()
-            
+
             if not vector_health:
-                logger.warning("⚠️ Qdrant连接异常，部分功能可能受限")
+                logger.warning("Qdrant连接异常，部分功能可能受限")
             if not graph_health:
-                logger.warning("⚠️ Neo4j连接异常，图搜索功能可能受限")
-            
+                logger.warning("Neo4j连接异常，图搜索功能可能受限")
+
             logger.info(f"🏥 数据库健康状态: Qdrant={'✅' if vector_health else '❌'}, Neo4j={'✅' if graph_health else '❌'}")
-            
+
         except Exception as e:
-            logger.error(f"❌ 数据库初始化失败: {e}")
+            logger.error(f"数据库初始化失败: {e}")
             logger.info("💡 请检查数据库配置和网络连接")
-            logger.info("💡 参考 DATABASE_SETUP_GUIDE.md 进行配置")
             raise
     
     def _init_nlp(self):
@@ -191,26 +203,26 @@ class SemanticMemory(BaseMemory):
                     nlp = spacy.load(model_name)
                     self.nlp_models[model_name] = nlp
                     loaded_models.append(lang_name)
-                    logger.info(f"✅ 加载{lang_name}spaCy模型: {model_name}")
+                    logger.info(f"加载{lang_name}spaCy模型: {model_name}")
                 except OSError:
-                    logger.warning(f"⚠️ {lang_name}spaCy模型不可用: {model_name}")
+                    logger.warning(f"{lang_name}spaCy模型不可用: {model_name}")
             
             # 设置主要NLP处理器
             if "zh_core_web_sm" in self.nlp_models:
                 self.nlp = self.nlp_models["zh_core_web_sm"]
-                logger.info("🎯 主要使用中文spaCy模型")
+                logger.info("主要使用中文spaCy模型")
             elif "en_core_web_sm" in self.nlp_models:
                 self.nlp = self.nlp_models["en_core_web_sm"]
-                logger.info("🎯 主要使用英文spaCy模型")
+                logger.info("主要使用英文spaCy模型")
             else:
                 self.nlp = None
-                logger.warning("⚠️ 无可用spaCy模型，实体提取将受限")
+                logger.warning("无可用spaCy模型，实体提取将受限")
             
             if loaded_models:
-                logger.info(f"📚 可用语言模型: {', '.join(loaded_models)}")
+                logger.info(f"可用语言模型: {', '.join(loaded_models)}")
                 
         except ImportError:
-            logger.warning("⚠️ spaCy不可用，实体提取将受限")
+            logger.warning("spaCy不可用，实体提取将受限")
             self.nlp = None
             self.nlp_models = {}
     
@@ -252,7 +264,7 @@ class SemanticMemory(BaseMemory):
             )
             
             if not success:
-                logger.warning("⚠️ 向量存储失败，但记忆已添加到图数据库")
+                logger.warning("向量存储失败，但记忆已添加到图数据库")
             
             # 5. 添加实体信息到元数据
             memory_item.metadata["entities"] = [e.entity_id for e in entities]
@@ -263,11 +275,11 @@ class SemanticMemory(BaseMemory):
             # 6. 存储记忆
             self.semantic_memories.append(memory_item)
             
-            logger.info(f"✅ 添加语义记忆: {len(entities)}个实体, {len(relations)}个关系")
+            logger.info(f"添加语义记忆: {len(entities)}个实体, {len(relations)}个关系")
             return memory_item.id
         
         except Exception as e:
-            logger.error(f"❌ 添加语义记忆失败: {e}")
+            logger.error(f"添加语义记忆失败: {e}")
             raise
     
     def retrieve(self, query: str, limit: int = 5, **kwargs) -> List[MemoryItem]:
@@ -337,11 +349,11 @@ class SemanticMemory(BaseMemory):
                 )
                 result_memories.append(memory_item)
             
-            logger.info(f"✅ 检索到 {len(result_memories)} 条相关记忆")
+            logger.info(f"检索到 {len(result_memories)} 条相关记忆")
             return result_memories[:limit]
                 
         except Exception as e:
-            logger.error(f"❌ 检索语义记忆失败: {e}")
+            logger.error(f"检索语义记忆失败: {e}")
             return []
     
     def _vector_search(self, query: str, limit: int, user_id: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -376,7 +388,7 @@ class SemanticMemory(BaseMemory):
             return formatted_results
                 
         except Exception as e:
-            logger.error(f"❌ Qdrant向量搜索失败: {e}")
+            logger.error(f"Qdrant向量搜索失败: {e}")
             return []
 
     def _graph_search(self, query: str, limit: int, user_id: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -474,7 +486,7 @@ class SemanticMemory(BaseMemory):
             return results[:limit]
             
         except Exception as e:
-            logger.error(f"❌ Neo4j图搜索失败: {e}")
+            logger.error(f"Neo4j图搜索失败: {e}")
             return []
 
     def _combine_and_rank_results(
@@ -497,7 +509,7 @@ class SemanticMemory(BaseMemory):
             # 内容去重：检查是否已经有相同或高度相似的内容
             content_hash = hash(content.strip())
             if content_hash in content_seen:
-                logger.debug(f"⚠️ 跳过重复内容: {content[:30]}...")
+                logger.debug(f"跳过重复内容: {content[:30]}...")
                 continue
             
             content_seen.add(content_hash)
@@ -640,11 +652,11 @@ class SemanticMemory(BaseMemory):
                     logger.debug(f"🏷️ spaCy识别实体: '{ent.text}' -> {ent.label_} (置信度: {confidence})")
                 
             except Exception as e:
-                logger.warning(f"⚠️ spaCy实体识别失败: {e}")
+                logger.warning(f"spaCy实体识别失败: {e}")
                 import traceback
                 logger.debug(f"详细错误: {traceback.format_exc()}")
         else:
-            logger.warning("⚠️ 没有可用的spaCy模型进行实体识别")
+            logger.warning("没有可用的spaCy模型进行实体识别")
         
         return entities
     
@@ -724,7 +736,7 @@ class SemanticMemory(BaseMemory):
             logger.debug(f"🔗 已将词法分析结果存储到Neo4j: {len([t for t in doc if not t.is_punct and not t.is_space])} 个词元")
             
         except Exception as e:
-            logger.warning(f"⚠️ 存储词法分析失败: {e}")
+            logger.warning(f"存储词法分析失败: {e}")
     
     def _extract_relations(self, text: str, entities: List[Entity]) -> List[Relation]:
         """提取关系"""
@@ -774,7 +786,7 @@ class SemanticMemory(BaseMemory):
             return success
             
         except Exception as e:
-            logger.error(f"❌ 添加实体到图数据库失败: {e}")
+            logger.error(f"添加实体到图数据库失败: {e}")
             return False
     
     def _add_relation_to_graph(self, relation: Relation, memory_item: MemoryItem):
@@ -804,7 +816,7 @@ class SemanticMemory(BaseMemory):
             return success
             
         except Exception as e:
-            logger.error(f"❌ 添加关系到图数据库失败: {e}")
+            logger.error(f"添加关系到图数据库失败: {e}")
             return False
     
     def _calculate_graph_relevance_neo4j(self, memory_metadata: Dict[str, Any], query_entities: List[Entity]) -> float:
@@ -877,9 +889,9 @@ class SemanticMemory(BaseMemory):
         logger.debug(f"🔍 查找记忆ID: {memory_id}, 当前记忆数: {len(self.semantic_memories)}")
         for memory in self.semantic_memories:
             if memory.id == memory_id:
-                logger.debug(f"✅ 找到记忆: {memory.content[:50]}...")
+                logger.debug(f"找到记忆: {memory.content[:50]}...")
                 return memory
-        logger.debug(f"❌ 未找到记忆ID: {memory_id}")
+        logger.debug(f"未找到记忆ID: {memory_id}")
         return None
     
     def update(
@@ -930,7 +942,7 @@ class SemanticMemory(BaseMemory):
                 return True
             
         except Exception as e:
-            logger.error(f"❌ 更新记忆失败: {e}")
+            logger.error(f"更新记忆失败: {e}")
         return False
     
     def remove(self, memory_id: str) -> bool:
@@ -955,7 +967,7 @@ class SemanticMemory(BaseMemory):
                 return True
             
         except Exception as e:
-            logger.error(f"❌ 删除记忆失败: {e}")
+            logger.error(f"删除记忆失败: {e}")
         return False
     
     def _cleanup_entities_and_relations(self, entity_ids: List[str]):
@@ -1013,17 +1025,17 @@ class SemanticMemory(BaseMemory):
             if self.vector_store:
                 success = self.vector_store.clear_collection()
                 if success:
-                    logger.info("✅ Qdrant向量数据库已清空")
+                    logger.info("Qdrant向量数据库已清空")
                 else:
-                    logger.warning("⚠️ Qdrant清空失败")
+                    logger.warning("Qdrant清空失败")
             
             # 清空Neo4j图数据库
             if self.graph_store:
                 success = self.graph_store.clear_all()
                 if success:
-                    logger.info("✅ Neo4j图数据库已清空")
+                    logger.info("Neo4j图数据库已清空")
                 else:
-                    logger.warning("⚠️ Neo4j清空失败")
+                    logger.warning("Neo4j清空失败")
             
             # 清空本地缓存
             self.semantic_memories.clear()
@@ -1034,7 +1046,7 @@ class SemanticMemory(BaseMemory):
             logger.info("🧹 语义记忆系统已完全清空")
             
         except Exception as e:
-            logger.error(f"❌ 清空语义记忆失败: {e}")
+            logger.error(f"清空语义记忆失败: {e}")
             # 即使数据库清空失败，也要清空本地缓存
         self.semantic_memories.clear()
         self.memory_embeddings.clear()
@@ -1115,7 +1127,7 @@ class SemanticMemory(BaseMemory):
         try:
             # 使用Neo4j图数据库查找相关实体
             if not self.graph_store:
-                logger.warning("⚠️ Neo4j图数据库不可用")
+                logger.warning("Neo4j图数据库不可用")
                 return []
             
             # 使用Neo4j查找相关实体
@@ -1149,7 +1161,7 @@ class SemanticMemory(BaseMemory):
             related.sort(key=lambda x: (x["distance"], -x["strength"]))
             
         except Exception as e:
-            logger.error(f"❌ 获取相关实体失败: {e}")
+            logger.error(f"获取相关实体失败: {e}")
         
         return related
     
@@ -1174,7 +1186,7 @@ class SemanticMemory(BaseMemory):
                 }
             }
         except Exception as e:
-            logger.error(f"❌ 导出知识图谱失败: {e}")
+            logger.error(f"导出知识图谱失败: {e}")
             return {
                 "entities": {},
                 "relations": [],

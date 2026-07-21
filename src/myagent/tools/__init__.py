@@ -12,6 +12,8 @@ from .builtin.todowrite_tool import TodoWriteTool, TodoItem, TodoList
 from .builtin.devlog_tool import DevLogTool, DevLogEntry, DevLogStore, CATEGORIES
 from .builtin.task_tool import TaskTool
 from .builtin.skill_tool import SkillTool
+from .builtin.memory_tool import MemoryTool
+from .builtin.rag_tool import RAGTool
 
 # 子代理机制
 from .tool_filter import ToolFilter, ReadOnlyFilter, FullAccessFilter, CustomFilter

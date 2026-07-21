@@ -3,11 +3,9 @@
 import ast
 import operator
 import math
-from typing import Dict, Any, List
+from typing import Dict, Any
 
-from ..base import Tool, ToolParameter
-from ..response import ToolResponse
-from ..errors import ToolErrorCode
+from ..base import Tool
 
 class CalculatorTool(Tool):
     """Python计算器工具"""
@@ -46,7 +44,7 @@ class CalculatorTool(Tool):
             description="执行数学计算。支持基本运算、数学函数等。例如：2+3*4, sqrt(16), sin(pi/2)等。"
         )
     
-    def run(self, parameters: Dict[str, Any]) -> ToolResponse:
+    def run(self, parameters: Dict[str, Any]) -> str:
         """
         执行计算
 
@@ -54,52 +52,26 @@ class CalculatorTool(Tool):
             parameters: 包含input参数的字典
 
         Returns:
-            ToolResponse: 标准化的工具响应对象
+            计算结果
         """
         # 支持两种参数格式：input 和 expression
         expression = parameters.get("input", "") or parameters.get("expression", "")
-
         if not expression:
-            return ToolResponse.error(
-                code=ToolErrorCode.INVALID_PARAM,
-                message="计算表达式不能为空"
-            )
+            return "错误：计算表达式不能为空"
 
-        print(f"正在计算: {expression}")
+        print(f"🧮 正在计算: {expression}")
 
         try:
             # 解析表达式
             node = ast.parse(expression, mode='eval')
             result = self._eval_node(node.body)
             result_str = str(result)
-
-            print(f"计算结果: {result_str}")
-
-            return ToolResponse.success(
-                text=f"计算结果: {result_str}",
-         data={
-                    "expression": expression,
-                    "result": result,
-                    "result_str": result_str,
-                    "result_type": type(result).__name__
-                }
-            )
-        except SyntaxError as e:
-            error_msg = f"表达式语法错误: {str(e)}"
-            print(f"{error_msg}")
-            return ToolResponse.error(
-                code=ToolErrorCode.INVALID_FORMAT,
-                message=error_msg,
-                context={"expression": expression}
-            )
+            print(f"✅ 计算结果: {result_str}")
+            return result_str
         except Exception as e:
             error_msg = f"计算失败: {str(e)}"
-            print(f"{error_msg}")
-            return ToolResponse.error(
-                code=ToolErrorCode.EXECUTION_ERROR,
-                message=error_msg,
-                context={"expression": expression}
-            )
+            print(f"❌ {error_msg}")
+            return error_msg
     
     def _eval_node(self, node):
         """递归计算AST节点"""

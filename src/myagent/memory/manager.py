@@ -288,9 +288,6 @@ class MemoryManager:
             memory_instance.clear()
         logger.info("所有记忆已清空")
 
-
-
-
     def _classify_memory_type(self, content: str, metadata: Optional[Dict[str, Any]]) -> str:
         """自动分类记忆类型"""
         if metadata and metadata.get("type"):
