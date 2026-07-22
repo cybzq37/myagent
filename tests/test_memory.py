@@ -1,4 +1,3 @@
-# 配置好同级文件夹下.env中的大模型API
 from dotenv import load_dotenv
 load_dotenv()
 
