@@ -535,7 +535,8 @@ class RAGTool(Tool):
             
             # 5. 调用 LLM 生成答案
             llm_start = time.time()
-            answer = self.llm.invoke(enhanced_prompt)
+            llm_response = self.llm.invoke(enhanced_prompt)
+            answer = llm_response.content if hasattr(llm_response, 'content') else str(llm_response)
             llm_time = int((time.time() - llm_start) * 1000)
             
             if not answer or not answer.strip():
@@ -544,7 +545,7 @@ class RAGTool(Tool):
             # 6. 构建最终回答
             final_answer = self._format_final_answer(
                 question=user_question,
-                answer=answer.strip(),
+                answer=answer.strip() if answer else "",
                 citations=citations if include_citations else None,
                 search_time=search_time,
                 llm_time=llm_time,
@@ -959,4 +960,3 @@ class RAGTool(Tool):
             summary.extend(results)
 
         return "\n".join(summary)
-

@@ -450,6 +450,16 @@ class Neo4jGraphStore:
         """析构函数，清理资源"""
         if hasattr(self, 'driver') and self.driver:
             try:
-                self.driver.close()
-            except:
+                # 显式关闭，避免解释器关闭时触发 Bolt.__del__ 的 ImportError
+                driver = self.driver
+                self.driver = None
+                driver.close()
+            except ImportError:
+                # 解释器关闭中，sys.meta_path 已为 None
                 pass
+            except Exception:
+                pass
+
+    def close(self):
+        """显式关闭 Neo4j 连接。应在程序结束前调用。"""
+        self.__del__()
