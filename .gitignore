@@ -163,3 +163,4 @@ cython_debug/
 .venv
 
 memory/traces
+knowledge_base/Happy-LLM-0727.pdf

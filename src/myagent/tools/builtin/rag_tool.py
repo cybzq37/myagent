@@ -1,10 +1,10 @@
 """RAG工具 - 检索增强生成
 
 为HelloAgents框架提供简洁易用的RAG能力：
-- 🔄 数据流程：用户数据 → 文档解析 → 向量化存储 → 智能检索 → LLM增强问答
-- 📚 多格式支持：PDF、Word、Excel、PPT、图片、音频、网页等
-- 🧠 智能问答：自动检索相关内容，注入提示词，生成准确答案
-- 🏷️ 命名空间：支持多项目隔离，便于管理不同知识库
+- 数据流程：用户数据 → 文档解析 → 向量化存储 → 智能检索 → LLM增强问答
+- 多格式支持：PDF、Word、Excel、PPT、图片、音频、网页等
+- 智能问答：自动检索相关内容，注入提示词，生成准确答案
+- 命名空间：支持多项目隔离，便于管理不同知识库
 
 使用示例：
 ```python
@@ -81,12 +81,12 @@ class RAGTool(Tool):
             self.llm = AgentLLM()
 
             self.initialized = True
-            print(f"✅ RAG工具初始化成功: namespace={self.rag_namespace}, collection={self.collection_name}")
+            print(f"RAG工具初始化成功: namespace={self.rag_namespace}, collection={self.collection_name}")
             
         except Exception as e:
             self.initialized = False
             self.init_error = str(e)
-            print(f"❌ RAG工具初始化失败: {e}")
+            print(f"RAG工具初始化失败: {e}")
 
     def _get_pipeline(self, namespace: Optional[str] = None) -> Dict[str, Any]:
         """获取指定命名空间的 RAG 管道，若不存在则自动创建"""
@@ -113,10 +113,10 @@ class RAGTool(Tool):
             执行结果字符串
         """
         if not self.validate_parameters(parameters):
-            return "❌ 参数验证失败：缺少必需的参数"
+            return "参数验证失败：缺少必需的参数"
 
         if not self.initialized:
-            return f"❌ RAG工具未正确初始化，请检查配置: {getattr(self, 'init_error', '未知错误')}"
+            return f"RAG工具未正确初始化，请检查配置: {getattr(self, 'init_error', '未知错误')}"
 
         action = parameters.get("action")
 
@@ -166,9 +166,9 @@ class RAGTool(Tool):
                     namespace=parameters.get("namespace", "default")
                 )
             else:
-                return f"❌ 不支持的操作: {action}"
+                return f"不支持的操作: {action}"
         except Exception as e:
-            return f"❌ 执行操作 '{action}' 时发生错误: {str(e)}"
+            return f"执行操作 '{action}' 时发生错误: {str(e)}"
 
     def get_parameters(self) -> List[ToolParameter]:
         """获取工具参数定义 - Tool基类要求的接口"""
@@ -254,7 +254,7 @@ class RAGTool(Tool):
         """
         try:
             if not file_path or not os.path.exists(file_path):
-                return f"❌ 文件不存在: {file_path}"
+                return f"文件不存在: {file_path}"
             
             pipeline = self._get_pipeline(namespace)
             t0 = time.time()
@@ -269,17 +269,17 @@ class RAGTool(Tool):
             process_ms = int((t1 - t0) * 1000)
             
             if chunks_added == 0:
-                return f"⚠️ 未能从文件解析内容: {os.path.basename(file_path)}"
+                return f"未能从文件解析内容: {os.path.basename(file_path)}"
             
             return (
-                f"✅ 文档已添加到知识库: {os.path.basename(file_path)}\n"
-                f"📊 分块数量: {chunks_added}\n"
-                f"⏱️ 处理时间: {process_ms}ms\n"
-                f"📝 命名空间: {pipeline.get('namespace', self.rag_namespace)}"
+                f"档已添加到知识库: {os.path.basename(file_path)}\n"
+                f"分块数量: {chunks_added}\n"
+                f"处理时间: {process_ms}ms\n"
+                f"命名空间: {pipeline.get('namespace', self.rag_namespace)}"
             )
             
         except Exception as e:
-            return f"❌ 添加文档失败: {str(e)}"
+            return f"添加文档失败: {str(e)}"
     
     @tool_action("rag_add_text", "添加文本到知识库")
     def _add_text(
@@ -305,7 +305,7 @@ class RAGTool(Tool):
         metadata = None
         try:
             if not text or not text.strip():
-                return "❌ 文本内容不能为空"
+                return "文本内容不能为空"
             
             # 创建临时文件
             document_id = document_id or f"text_{abs(hash(text)) % 100000}"
@@ -328,13 +328,13 @@ class RAGTool(Tool):
                 process_ms = int((t1 - t0) * 1000)
                 
                 if chunks_added == 0:
-                    return f"⚠️ 未能从文本生成有效分块"
+                    return f"未能从文本生成有效分块"
                 
                 return (
-                    f"✅ 文本已添加到知识库: {document_id}\n"
-                    f"📊 分块数量: {chunks_added}\n"
-                    f"⏱️ 处理时间: {process_ms}ms\n"
-                    f"📝 命名空间: {pipeline.get('namespace', self.rag_namespace)}"
+                    f"文本已添加到知识库: {document_id}\n"
+                    f"分块数量: {chunks_added}\n"
+                    f"处理时间: {process_ms}ms\n"
+                    f"命名空间: {pipeline.get('namespace', self.rag_namespace)}"
                 )
                 
             finally:
@@ -346,7 +346,7 @@ class RAGTool(Tool):
                     pass
             
         except Exception as e:
-            return f"❌ 添加文本失败: {str(e)}"
+            return f"添加文本失败: {str(e)}"
     
     @tool_action("rag_search", "搜索知识库中的相关内容")
     def _search(
@@ -375,7 +375,7 @@ class RAGTool(Tool):
         """
         try:
             if not query or not query.strip():
-                return "❌ 搜索查询不能为空"
+                return "搜索查询不能为空"
             
             # 使用统一 RAG 管道搜索
             pipeline = self._get_pipeline(namespace)
@@ -396,7 +396,7 @@ class RAGTool(Tool):
                 )
             
             if not results:
-                return f"🔍 未找到与 '{query}' 相关的内容"
+                return f"未找到与 '{query}' 相关的内容"
             
             # 格式化搜索结果
             search_result = ["搜索结果："]
@@ -426,7 +426,7 @@ class RAGTool(Tool):
             return "\n".join(search_result)
             
         except Exception as e:
-            return f"❌ 搜索失败: {str(e)}"
+            return f"搜索失败: {str(e)}"
     
     @tool_action("rag_ask", "基于知识库进行智能问答")
     def _ask(
@@ -461,10 +461,10 @@ class RAGTool(Tool):
         try:
             # 验证问题
             if not question or not question.strip():
-                return "❌ 请提供要询问的问题"
+                return "请提供要询问的问题"
 
             user_question = question.strip()
-            print(f"🔍 智能问答: {user_question}")
+            print(f"智能问答: {user_question}")
             
             # 1. 检索相关内容
             pipeline = self._get_pipeline(namespace)
@@ -487,8 +487,8 @@ class RAGTool(Tool):
             
             if not results:
                 return (
-                    f"🤔 抱歉，我在知识库中没有找到与「{user_question}」相关的信息。\n\n"
-                    f"💡 建议：\n"
+                    f"抱歉，我在知识库中没有找到与「{user_question}」相关的信息。\n\n"
+                    f"建议：\n"
                     f"• 尝试使用更简洁的关键词\n"
                     f"• 检查是否已添加相关文档\n"
                     f"• 使用 stats 操作查看知识库状态"
@@ -539,7 +539,7 @@ class RAGTool(Tool):
             llm_time = int((time.time() - llm_start) * 1000)
             
             if not answer or not answer.strip():
-                return "❌ LLM未能生成有效答案，请稍后重试"
+                return "LLM未能生成有效答案，请稍后重试"
             
             # 6. 构建最终回答
             final_answer = self._format_final_answer(
@@ -554,7 +554,7 @@ class RAGTool(Tool):
             return final_answer
             
         except Exception as e:
-            return f"❌ 智能问答失败: {str(e)}\n💡 请检查知识库状态或稍后重试"
+            return f"智能问答失败: {str(e)}\n 请检查知识库状态或稍后重试"
     
     def _clean_content_for_context(self, content: str) -> str:
         """清理内容用于上下文"""
@@ -583,11 +583,11 @@ class RAGTool(Tool):
         """构建系统提示词"""
         return (
             "你是一个专业的知识助手，具备以下能力：\n"
-            "1. 📖 精准理解：仔细理解用户问题的核心意图\n"
-            "2. 🎯 可信回答：严格基于提供的上下文信息回答，不编造内容\n"
-            "3. 🔍 信息整合：从多个片段中提取关键信息，形成完整答案\n"
-            "4. 💡 清晰表达：用简洁明了的语言回答，适当使用结构化格式\n"
-            "5. 🚫 诚实表达：如果上下文不足以回答问题，请坦诚说明\n\n"
+            "1. 精准理解：仔细理解用户问题的核心意图\n"
+            "2. 可信回答：严格基于提供的上下文信息回答，不编造内容\n"
+            "3. 信息整合：从多个片段中提取关键信息，形成完整答案\n"
+            "4. 清晰表达：用简洁明了的语言回答，适当使用结构化格式\n"
+            "5. 诚实表达：如果上下文不足以回答问题，请坦诚说明\n\n"
             "回答格式要求：\n"
             "• 直接回答核心问题\n"
             "• 必要时使用要点或步骤\n"
@@ -606,17 +606,17 @@ class RAGTool(Tool):
     
     def _format_final_answer(self, question: str, answer: str, citations: Optional[List[Dict]] = None, search_time: int = 0, llm_time: int = 0, avg_score: float = 0) -> str:
         """格式化最终答案"""
-        result = [f"🤖 **智能问答结果**\n"]
+        result = [f"**智能问答结果**\n"]
         result.append(answer)
         
         if citations:
-            result.append("\n\n📚 **参考来源**")
+            result.append("\n\n**参考来源**")
             for citation in citations:
-                score_emoji = "🟢" if citation["score"] > 0.8 else "🟡" if citation["score"] > 0.6 else "🔵"
+                score_emoji = "[绿]" if citation["score"] > 0.8 else "[黄]" if citation["score"] > 0.6 else "[蓝]"
                 result.append(f"{score_emoji} [{citation['index']}] {citation['source']} (相似度: {citation['score']:.3f})")
         
         # 添加性能信息（调试模式）
-        result.append(f"\n⚡ 检索: {search_time}ms | 生成: {llm_time}ms | 平均相似度: {avg_score:.3f}")
+        result.append(f"\n[耗时] 检索: {search_time}ms | 生成: {llm_time}ms | 平均相似度: {avg_score:.3f}")
         
         return "\n".join(result)
 
@@ -634,7 +634,7 @@ class RAGTool(Tool):
         try:
             if not confirm:
                 return (
-                    "⚠️ 危险操作：清空知识库将删除所有数据！\n"
+                    "[警告] 危险操作：清空知识库将删除所有数据！\n"
                     "请使用 confirm=true 参数确认执行。"
                 )
             
@@ -651,12 +651,12 @@ class RAGTool(Tool):
                     collection_name=self.collection_name,
                     rag_namespace=namespace_id
                 )
-                return f"✅ 知识库已成功清空（命名空间：{namespace_id}）"
+                return f"[OK] 知识库已成功清空（命名空间：{namespace_id}）"
             else:
-                return "❌ 清空知识库失败"
+                return "清空知识库失败"
             
         except Exception as e:
-            return f"❌ 清空知识库失败: {str(e)}"
+            return f"清空知识库失败: {str(e)}"
 
     @tool_action("rag_stats", "获取知识库统计信息")
     def _get_stats(self, namespace: str = "default") -> str:
@@ -673,10 +673,10 @@ class RAGTool(Tool):
             stats = pipeline["get_stats"]()
             
             stats_info = [
-                "📊 **RAG 知识库统计**",
-                f"📝 命名空间: {pipeline.get('namespace', self.rag_namespace)}",
-                f"📋 集合名称: {self.collection_name}",
-                f"📂 存储根路径: {self.knowledge_base_path}"
+                "[统计] **RAG 知识库统计**",
+                f"[信息] 命名空间: {pipeline.get('namespace', self.rag_namespace)}",
+                f"[配置] 集合名称: {self.collection_name}",
+                f"[目录] 存储根路径: {self.knowledge_base_path}"
             ]
             
             # 添加存储统计
@@ -689,8 +689,8 @@ class RAGTool(Tool):
                 )
                 
                 stats_info.extend([
-                    f"📦 存储类型: {store_type}",
-                    f"📊 文档分块数: {int(total_vectors)}",
+                    f"[存储] 存储类型: {store_type}",
+                    f"[统计] 文档分块数: {int(total_vectors)}",
                 ])
                 
                 if "config" in stats:
@@ -699,22 +699,22 @@ class RAGTool(Tool):
                         vector_size = config.get("vector_size", "unknown")
                         distance = config.get("distance", "unknown")
                         stats_info.extend([
-                            f"🔢 向量维度: {vector_size}",
-                            f"📎 距离度量: {distance}"
+                            f"[维度] 向量维度: {vector_size}",
+                            f"[距离] 距离度量: {distance}"
                         ])
             
             # 添加系统状态
             stats_info.extend([
                 "",
-                "🟢 **系统状态**",
-                f"✅ RAG 管道: {'正常' if self.initialized else '异常'}",
-                f"✅ LLM 连接: {'正常' if hasattr(self, 'llm') else '异常'}"
+                "[绿] **系统状态**",
+                f"[OK] RAG 管道: {'正常' if self.initialized else '异常'}",
+                f"[OK] LLM 连接: {'正常' if hasattr(self, 'llm') else '异常'}"
             ])
             
             return "\n".join(stats_info)
             
         except Exception as e:
-            return f"❌ 获取统计信息失败: {str(e)}"
+            return f"获取统计信息失败: {str(e)}"
 
     def get_relevant_context(self, query: str, limit: int = 3, max_chars: int = 1200, namespace: Optional[str] = None) -> str:
         """为查询获取相关上下文
@@ -757,10 +757,10 @@ class RAGTool(Tool):
         """批量添加文本"""
         try:
             if not texts:
-                return "❌ 文本列表不能为空"
+                return "文本列表不能为空"
             
             if document_ids and len(document_ids) != len(texts):
-                return "❌ 文本数量和文档ID数量不匹配"
+                return "文本数量和文档ID数量不匹配"
             
             pipeline = self._get_pipeline(namespace)
             t0 = time.time()
@@ -800,14 +800,14 @@ class RAGTool(Tool):
             process_ms = int((t1 - t0) * 1000)
             
             return (
-                f"✅ 批量添加完成\n"
-                f"📊 成功文件: {len(successful_files)}/{len(texts)}\n"
-                f"📊 总分块数: {total_chunks}\n"
+                f"[OK] 批量添加完成\n"
+                f"[统计] 成功文件: {len(successful_files)}/{len(texts)}\n"
+                f"[统计] 总分块数: {total_chunks}\n"
                 f"⏱️ 处理时间: {process_ms}ms"
             )
             
         except Exception as e:
-            return f"❌ 批量添加失败: {str(e)}"
+            return f"批量添加失败: {str(e)}"
     
     def clear_all_namespaces(self) -> str:
         """清空当前工具管理的所有命名空间数据"""
@@ -819,9 +819,9 @@ class RAGTool(Tool):
             self._pipelines.clear()
             # 重新初始化默认命名空间
             self._init_components()
-            return "✅ 所有命名空间数据已清空并重新初始化"
+            return "[OK] 所有命名空间数据已清空并重新初始化"
         except Exception as e:
-            return f"❌ 清空所有命名空间失败: {str(e)}"
+            return f"清空所有命名空间失败: {str(e)}"
     
     # ========================================
     # 便捷接口方法（简化用户调用）
@@ -867,7 +867,7 @@ class RAGTool(Tool):
     def add_documents_batch(self, file_paths: List[str], namespace: str = "default") -> str:
         """批量添加多个文档"""
         if not file_paths:
-            return "❌ 文件路径列表不能为空"
+            return "文件路径列表不能为空"
         
         results = []
         successful = 0
@@ -876,11 +876,11 @@ class RAGTool(Tool):
         start_time = time.time()
         
         for i, file_path in enumerate(file_paths, 1):
-            print(f"📄 处理文档 {i}/{len(file_paths)}: {os.path.basename(file_path)}")
+            print(f"[文档] 处理文档 {i}/{len(file_paths)}: {os.path.basename(file_path)}")
             
             try:
                 result = self.add_document(file_path, namespace)
-                if "✅" in result:
+                if "[OK]" in result:
                     successful += 1
                     # 提取分块数量
                     if "分块数量:" in result:
@@ -888,23 +888,23 @@ class RAGTool(Tool):
                         total_chunks += chunks
                 else:
                     failed += 1
-                    results.append(f"❌ {os.path.basename(file_path)}: 处理失败")
+                    results.append(f"{os.path.basename(file_path)}: 处理失败")
             except Exception as e:
                 failed += 1
-                results.append(f"❌ {os.path.basename(file_path)}: {str(e)}")
+                results.append(f"{os.path.basename(file_path)}: {str(e)}")
         
         process_time = int((time.time() - start_time) * 1000)
         
         summary = [
-            "📊 **批量处理完成**",
-            f"✅ 成功: {successful}/{len(file_paths)} 个文档",
-            f"📊 总分块数: {total_chunks}",
-            f"⏱️ 总耗时: {process_time}ms",
-            f"📝 命名空间: {namespace}"
+            "**批量处理完成**",
+            f"成功: {successful}/{len(file_paths)} 个文档",
+            f"总分块数: {total_chunks}",
+            f"总耗时: {process_time}ms",
+            f"命名空间: {namespace}"
         ]
         
         if failed > 0:
-            summary.append(f"❌ 失败: {failed} 个文档")
+            summary.append(f"失败: {failed} 个文档")
             summary.append("\n**失败详情:**")
             summary.extend(results)
         
@@ -913,10 +913,10 @@ class RAGTool(Tool):
     def add_texts_batch(self, texts: List[str], namespace: str = "default", document_ids: Optional[List[str]] = None) -> str:
         """批量添加多个文本"""
         if not texts:
-            return "❌ 文本列表不能为空"
+            return "文本列表不能为空"
         
         if document_ids and len(document_ids) != len(texts):
-            return "❌ 文本数量和文档ID数量不匹配"
+            return "文本数量和文档ID数量不匹配"
         
         results = []
         successful = 0
@@ -926,11 +926,11 @@ class RAGTool(Tool):
         
         for i, text in enumerate(texts):
             doc_id = document_ids[i] if document_ids else f"batch_text_{i+1}"
-            print(f"📝 处理文本 {i+1}/{len(texts)}: {doc_id}")
+            print(f"[信息] 处理文本 {i+1}/{len(texts)}: {doc_id}")
             
             try:
                 result = self.add_text(text, namespace, doc_id)
-                if "✅" in result:
+                if "[OK]" in result:
                     successful += 1
                     # 提取分块数量
                     if "分块数量:" in result:
@@ -938,23 +938,23 @@ class RAGTool(Tool):
                         total_chunks += chunks
                 else:
                     failed += 1
-                    results.append(f"❌ {doc_id}: 处理失败")
+                    results.append(f"{doc_id}: 处理失败")
             except Exception as e:
                 failed += 1
-                results.append(f"❌ {doc_id}: {str(e)}")
+                results.append(f"{doc_id}: {str(e)}")
         
         process_time = int((time.time() - start_time) * 1000)
         
         summary = [
-            "📊 **批量文本处理完成**",
-            f"✅ 成功: {successful}/{len(texts)} 个文本",
-            f"📊 总分块数: {total_chunks}",
-            f"⏱️ 总耗时: {process_time}ms",
-            f"📝 命名空间: {namespace}"
+            "**批量文本处理完成**",
+            f"成功: {successful}/{len(texts)} 个文本",
+            f"总分块数: {total_chunks}",
+            f"总耗时: {process_time}ms",
+            f"命名空间: {namespace}"
         ]
         
         if failed > 0:
-            summary.append(f"❌ 失败: {failed} 个文本")
+            summary.append(f"失败: {failed} 个文本")
             summary.append("\n**失败详情:**")
             summary.extend(results)
 

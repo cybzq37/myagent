@@ -27,6 +27,7 @@ qdrant-client = ">=1.6.0,<3.0.0"
 neo4j = ">=5.0.0,<6.0.0"
 tiktoken = ">=0.5.0"
 pyyaml = ">=6.0.0"
+markitdown = {version = ">=0.0.1", extras = ["pdf", "docx", "xlsx", "pptx"]}
 # 可选依赖（按需启用）
 google-genai = {version = ">=1.0.0", optional = true}
 anthropic = {version = ">=0.20.0", optional = true}
