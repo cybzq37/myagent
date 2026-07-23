@@ -5,8 +5,6 @@
 2. Select: 基于优先级、相关性、多样性筛选
 3. Structure: 组织成结构化上下文模板
 4. Compress: 在预算内压缩与规范化
-
-注意：MemoryTool 和 RAGTool 已被移除，如需使用请自行实现
 """
 
 from typing import Dict, Any, List, Optional, Tuple
@@ -64,8 +62,8 @@ class ContextConfig:
     mmr_lambda: float = 0.7  # MMR平衡参数（0=纯多样性, 1=纯相关性）
     system_prompt_template: str = ""  # 系统提示模板
     enable_compression: bool = True  # 启用压缩
-    recency_weight: float = 0.3
-    relevance_weight: float = 0.7
+    recency_weight: float = 0.3  # 新近性权重（0.0-1.0）
+    relevance_weight: float = 0.7  # 相关性权重（0.0-1.0）
 
     def __post_init__(self):
         """验证配置参数"""
@@ -83,11 +81,11 @@ class ContextConfig:
 class ContextBuilder:
     """上下文构建器 - GSSC流水线
 
-    注意：MemoryTool 和 RAGTool 已被移除，此类暂时不可用
-
     用法示例：
     ```python
     builder = ContextBuilder(
+        memory_tool=memory_tool,
+        rag_tool=rag_tool,
         config=ContextConfig(max_tokens=8000)
     )
 
@@ -99,16 +97,23 @@ class ContextBuilder:
     ```
     """
 
-    def __init__(self, config: Optional[ContextConfig] = None):
+    def __init__(
+        self,
+        memory_tool=None,
+        rag_tool=None,
+        config: Optional[ContextConfig] = None,
+    ):
+        self.memory_tool = memory_tool
+        self.rag_tool = rag_tool
         self.config = config or ContextConfig()
-        self._encoding = tiktoken.get_encoding("cl100k_base")
+        self._encoding = tiktoken.get_encoding("cl100k_base")  # OPENAI模型使用的分词编码表，用于 token 计数
 
     def build(
         self,
-        user_query: str,
-        conversation_history: Optional[List[Message]] = None,
-        system_instructions: Optional[str] = None,
-        additional_packets: Optional[List[ContextPacket]] = None,
+        user_query: str,  # 用户查询
+        conversation_history: Optional[List[Message]] = None,  # 对话历史
+        system_instructions: Optional[str] = None,  # 系统指令
+        additional_packets: Optional[List[ContextPacket]] = None,  # 额外的上下文包
     ) -> str:
         """构建完整上下文
 
@@ -126,21 +131,21 @@ class ContextBuilder:
             user_query=user_query,
             conversation_history=conversation_history or [],
             system_instructions=system_instructions,
-            additional_packets=additional_packets or [],
+            custom_packets=additional_packets or [],
         )
 
         # 2. Select: 筛选与排序
-        selected_packets = self._select(packets, user_query)
+        available_tokens = self.config.get_available_tokens()
+        selected_packets = self._select(packets, user_query, available_tokens)
 
         # 3. Structure: 组织成结构化模板
         structured_context = self._structure(
             selected_packets=selected_packets,
             user_query=user_query,
-            system_instructions=system_instructions,
         )
 
         # 4. Compress: 压缩与规范化（如果超预算）
-        final_context = self._compress(structured_context)
+        final_context = self._compress(structured_context, available_tokens)
 
         return final_context
 
@@ -233,169 +238,305 @@ class ContextBuilder:
         print(f"[ContextBuilder] 汇集了 {len(packets)} 个候选信息包")
         return packets
 
+    def _parse_memory_results(self, results: Any, user_query: str) -> List[ContextPacket]:
+        """把 MemoryTool 检索结果转成 ContextPacket 列表
+
+        MemoryTool.run({"action": "search"}) 返回格式化字符串，
+        这里整体打包成一个 packet；若结果是列表则逐条打包。
+        """
+        packets = []
+        if isinstance(results, str):
+            if results.strip():
+                packets.append(
+                    ContextPacket(
+                        content=results,
+                        token_count=self._count_tokens(results),
+                        relevance_score=0.7,
+                        metadata={"type": "memory_result"},
+                    )
+                )
+        elif isinstance(results, list):
+            for item in results:
+                content = str(item) if not isinstance(item, str) else item
+                packets.append(
+                    ContextPacket(
+                        content=content,
+                        token_count=self._count_tokens(content),
+                        relevance_score=0.7,
+                        metadata={"type": "memory_result"},
+                    )
+                )
+        return packets
+
+    def _parse_rag_results(self, results: Any, user_query: str) -> List[ContextPacket]:
+        """把 RAGTool 检索结果转成 ContextPacket 列表
+
+        RAGTool.run({"action": "search"}) 返回格式化字符串，
+        这里整体打包成一个 packet；若结果是列表则逐条打包。
+        """
+        packets = []
+        if isinstance(results, str):
+            if results.strip():
+                packets.append(
+                    ContextPacket(
+                        content=results,
+                        token_count=self._count_tokens(results),
+                        relevance_score=0.8,
+                        metadata={"type": "rag_result"},
+                    )
+                )
+        elif isinstance(results, list):
+            for item in results:
+                content = str(item) if not isinstance(item, str) else item
+                packets.append(
+                    ContextPacket(
+                        content=content,
+                        token_count=self._count_tokens(content),
+                        relevance_score=0.8,
+                        metadata={"type": "rag_result"},
+                    )
+                )
+        return packets
+
     def _select(
-        self, packets: List[ContextPacket], user_query: str
+        self, packets: List[ContextPacket], user_query: str, available_tokens: int
     ) -> List[ContextPacket]:
-        """Select: 基于分数与预算的筛选"""
-        # 1) 计算相关性（关键词重叠）
-        query_tokens = set(user_query.lower().split())
-        for packet in packets:
-            content_tokens = set(packet.content.lower().split())
-            if len(query_tokens) > 0:
-                overlap = len(query_tokens & content_tokens)
-                packet.relevance_score = overlap / len(query_tokens)
-            else:
-                packet.relevance_score = 0.0
+        """选择最相关的信息包
 
-        # 2) 计算新近性（指数衰减）
-        def recency_score(ts: datetime) -> float:
-            delta = max((datetime.now() - ts).total_seconds(), 0)
-            tau = 3600  # 1小时时间尺度，可暴露到配置
-            return math.exp(-delta / tau)
+        Args:
+            packets: 候选信息包列表
+            user_query: 用户查询(用于计算相关性)
+            available_tokens: 可用的 token 数量
 
-        # 3) 计算复合分：0.7*相关性 + 0.3*新近性
-        scored_packets: List[Tuple[float, ContextPacket]] = []
-        for p in packets:
-            rec = recency_score(p.timestamp)
-            score = (
-                self.config.relevance_weight * p.relevance_score
-                + self.config.recency_weight * rec
-            )
-            scored_packets.append((score, p))
-
-        # 4) 系统指令单独拿出，固定纳入
+        Returns:
+            List[ContextPacket]: 选中的信息包列表
+        """
+        # 1. 分离系统指令和其他信息
         system_packets = [
-            p for (_, p) in scored_packets if p.metadata.get("type") == "instructions"
+            p for p in packets if p.metadata.get("type") == "system_instruction"
         ]
-        remaining = [
-            p
-            for (s, p) in sorted(scored_packets, key=lambda x: x[0], reverse=True)
-            if p.metadata.get("type") != "instructions"
+        other_packets = [
+            p for p in packets if p.metadata.get("type") != "system_instruction"
         ]
 
-        # 5) 依据 min_relevance 过滤（对非系统包）
-        filtered = [
-            p for p in remaining if p.relevance_score >= self.config.min_relevance
-        ]
+        # 2. 计算系统指令占用的 token
+        system_tokens = sum(p.token_count for p in system_packets)
+        remaining_tokens = available_tokens - system_tokens
 
-        # 6) 按预算填充
-        available_tokens = self.config.get_available_tokens()
-        selected: List[ContextPacket] = []
-        used_tokens = 0
+        if remaining_tokens <= 0:
+            print("[WARNING] 系统指令已占满所有 token 预算")
+            return system_packets
 
-        # 先放入系统指令（不排序）
-        for p in system_packets:
-            if used_tokens + p.token_count <= available_tokens:
-                selected.append(p)
-                used_tokens += p.token_count
+        # 3. 为其他信息计算综合分数
+        scored_packets = []
+        for packet in other_packets:
+            # 计算相关性分数(如果尚未计算)
+            if packet.relevance_score == 0.5:  # 默认值,需要重新计算
+                relevance = self._calculate_relevance(packet.content, user_query)
+                packet.relevance_score = relevance
 
-        # 再按分数加入其余
-        for p in filtered:
-            if used_tokens + p.token_count > available_tokens:
-                continue
-            selected.append(p)
-            used_tokens += p.token_count
+            # 计算新近性分数
+            recency = self._calculate_recency(packet.timestamp)
 
+            # 综合分数 = 相关性权重 × 相关性 + 新近性权重 × 新近性
+            combined_score = (
+                self.config.relevance_weight * packet.relevance_score
+                + self.config.recency_weight * recency
+            )
+
+            # 过滤低于最小相关性阈值的信息
+            if packet.relevance_score >= self.config.min_relevance:
+                scored_packets.append((combined_score, packet))
+
+        # 4. 按分数降序排序
+        scored_packets.sort(key=lambda x: x[0], reverse=True)
+
+        # 5. 贪心选择:按分数从高到低填充,直到达到 token 上限
+        selected = system_packets.copy()
+        current_tokens = system_tokens
+
+        for score, packet in scored_packets:
+            if current_tokens + packet.token_count <= available_tokens:
+                selected.append(packet)
+                current_tokens += packet.token_count
+            else:
+                # Token 预算已满,停止选择
+                break
+
+        print(
+            f"[ContextBuilder] 选择了 {len(selected)} 个信息包,共 {current_tokens} tokens"
+        )
         return selected
 
-    def _structure(
-        self,
-        selected_packets: List[ContextPacket],
-        user_query: str,
-        system_instructions: Optional[str],
-    ) -> str:
-        """Structure: 组织成结构化上下文模板"""
+    def _calculate_relevance(self, content: str, query: str) -> float:
+        """计算内容与查询的相关性
+
+        使用简单的关键词重叠算法。在生产环境中,可以替换为向量相似度计算。
+
+        Args:
+            content: 内容文本
+            query: 查询文本
+
+        Returns:
+            float: 相关性分数(0.0-1.0)
+        """
+        # 分词(简单实现,可以使用更复杂的分词器)
+        content_words = set(content.lower().split())
+        query_words = set(query.lower().split())
+
+        if not query_words:
+            return 0.0
+
+        # Jaccard 相似度
+        intersection = content_words & query_words
+        union = content_words | query_words
+
+        return len(intersection) / len(union) if union else 0.0
+
+    def _calculate_recency(self, timestamp: datetime) -> float:
+        """计算时间近因性分数
+
+        使用指数衰减模型,24小时内保持高分,之后逐渐衰减。
+
+        Args:
+            timestamp: 信息的时间戳
+
+        Returns:
+            float: 新近性分数(0.0-1.0)
+        """
+        import math
+
+        age_hours = (datetime.now() - timestamp).total_seconds() / 3600
+
+        # 指数衰减:24小时内保持高分,之后逐渐衰减
+        decay_factor = 0.1  # 衰减系数
+        recency_score = math.exp(-decay_factor * age_hours / 24)
+
+        return max(0.1, min(1.0, recency_score))  # 限制在 [0.1, 1.0] 范围内
+
+    def _structure(self, selected_packets: List[ContextPacket], user_query: str) -> str:
+        """将选中的信息包组织成结构化的上下文模板
+
+        Args:
+            selected_packets: 选中的信息包列表
+            user_query: 用户查询
+
+        Returns:
+            str: 结构化的上下文字符串
+        """
+        # 按类型分组
+        system_instructions = []
+        evidence = []
+        context = []
+
+        for packet in selected_packets:
+            packet_type = packet.metadata.get("type", "general")
+
+            if packet_type == "system_instruction":
+                system_instructions.append(packet.content)
+            elif packet_type in ["rag_result", "knowledge"]:
+                evidence.append(packet.content)
+            else:
+                context.append(packet.content)
+
+        # 构建结构化模板
         sections = []
 
-        # [Role & Policies] - 系统指令
-        p0_packets = [
-            p for p in selected_packets if p.metadata.get("type") == "instructions"
-        ]
-        if p0_packets:
-            role_section = "[Role & Policies]\n"
-            role_section += "\n".join([p.content for p in p0_packets])
-            sections.append(role_section)
+        # [Role & Policies]
+        if system_instructions:
+            sections.append("[Role & Policies]\n" + "\n".join(system_instructions))
 
-        # [Task] - 当前任务
-        sections.append(f"[Task]\n用户问题：{user_query}")
+        # [Task]
+        sections.append(f"[Task]\n{user_query}")
 
-        # [State] - 任务状态
-        p1_packets = [
-            p for p in selected_packets if p.metadata.get("type") == "task_state"
-        ]
-        if p1_packets:
-            state_section = "[State]\n关键进展与未决问题：\n"
-            state_section += "\n".join([p.content for p in p1_packets])
-            sections.append(state_section)
+        # [Evidence]
+        if evidence:
+            sections.append("[Evidence]\n" + "\n---\n".join(evidence))
 
-        # [Evidence] - 事实证据
-        p2_packets = [
-            p
-            for p in selected_packets
-            if p.metadata.get("type")
-            in {"related_memory", "knowledge_base", "retrieval", "tool_result"}
-        ]
-        if p2_packets:
-            evidence_section = "[Evidence]\n事实与引用：\n"
-            for p in p2_packets:
-                evidence_section += f"\n{p.content}\n"
-            sections.append(evidence_section)
+        # [Context]
+        if context:
+            sections.append("[Context]\n" + "\n".join(context))
 
-        # [Context] - 辅助材料（历史等）
-        p3_packets = [
-            p for p in selected_packets if p.metadata.get("type") == "history"
-        ]
-        if p3_packets:
-            context_section = "[Context]\n对话历史与背景：\n"
-            context_section += "\n".join([p.content for p in p3_packets])
-            sections.append(context_section)
-
-        # [Output] - 输出约束
-        output_section = """[Output]
-                            请按以下格式回答：
-                            1. 结论（简洁明确）
-                            2. 依据（列出支撑证据及来源）
-                            3. 风险与假设（如有）
-                            4. 下一步行动建议（如适用）"""
-        sections.append(output_section)
+        # [Output]
+        sections.append("[Output]\n请基于以上信息,提供准确、有据的回答。")
 
         return "\n\n".join(sections)
 
-    def _compress(self, context: str) -> str:
-        """Compress: 压缩与规范化"""
-        if not self.config.enable_compression:
-            return context
+    def _compress(self, context: str, max_tokens: int) -> str:
+        """压缩超限的上下文
 
-        current_tokens = count_tokens(context)
-        available_tokens = self.config.get_available_tokens()
+        Args:
+            context: 原始上下文
+            max_tokens: 最大 token 限制
 
-        if current_tokens <= available_tokens:
-            return context
+        Returns:
+            str: 压缩后的上下文
+        """
+        current_tokens = self._count_tokens(context)
 
-        # 简单截断策略（保留前N个token）
-        # 实际应用中可用LLM做高保真摘要
-        print(f"上下文超预算 ({current_tokens} > {available_tokens})，执行截断")
+        if current_tokens <= max_tokens:
+            return context  # 无需压缩
 
-        # 按段落截断，保留结构
-        lines = context.split("\n")
-        compressed_lines = []
-        used_tokens = 0
+        print(f"[ContextBuilder] 上下文超限({current_tokens} > {max_tokens}),执行压缩")
 
-        for line in lines:
-            line_tokens = count_tokens(line)
-            if used_tokens + line_tokens > available_tokens:
+        # 分区压缩:保持结构完整性
+        sections = context.split("\n\n")
+        compressed_sections = []
+        current_total = 0
+
+        for section in sections:
+            section_tokens = self._count_tokens(section)
+
+            if current_total + section_tokens <= max_tokens:
+                # 完整保留
+                compressed_sections.append(section)
+                current_total += section_tokens
+            else:
+                # 部分保留
+                remaining_tokens = max_tokens - current_total
+                if remaining_tokens > 50:  # 至少保留 50 tokens
+                    # 简单截断(生产环境中可以使用 LLM 摘要)
+                    truncated = self._truncate_text(section, remaining_tokens)
+                    compressed_sections.append(truncated + "\n[... 内容已压缩 ...]")
                 break
-            compressed_lines.append(line)
-            used_tokens += line_tokens
 
-        return "\n".join(compressed_lines)
+        compressed_context = "\n\n".join(compressed_sections)
+        final_tokens = self._count_tokens(compressed_context)
+        print(f"[ContextBuilder] 压缩完成: {current_tokens} -> {final_tokens} tokens")
 
+        return compressed_context
 
-def count_tokens(text: str) -> int:
-    """计算文本token数（使用tiktoken）"""
-    try:
-        encoding = tiktoken.get_encoding("cl100k_base")
-        return len(encoding.encode(text))
-    except Exception:
-        # 降级方案：粗略估算（1 token ≈ 4 字符）
-        return len(text) // 4
+    def _truncate_text(self, text: str, max_tokens: int) -> str:
+        """截断文本到指定 token 数量
+
+        Args:
+            text: 原始文本
+            max_tokens: 最大 token 数量
+
+        Returns:
+            str: 截断后的文本
+        """
+        # 简单实现:按字符比例估算
+        # 生产环境中应该使用精确的 tokenizer
+        char_per_token = (
+            len(text) / self._count_tokens(text) if self._count_tokens(text) > 0 else 4
+        )
+        max_chars = int(max_tokens * char_per_token)
+
+        return text[:max_chars]
+
+    def _count_tokens(self, text: str) -> int:
+        """估算文本的 token 数量
+
+        Args:
+            text: 文本内容
+
+        Returns:
+            int: token 数量
+        """
+        # 简单估算:中文 1 字符 ≈ 1 token,英文 1 单词 ≈ 1.3 tokens
+        # 生产环境中应该使用实际的 tokenizer
+        chinese_chars = sum(1 for ch in text if "\u4e00" <= ch <= "\u9fff")
+        english_words = len([w for w in text.split() if w])
+
+        return int(chinese_chars + english_words * 1.3)
